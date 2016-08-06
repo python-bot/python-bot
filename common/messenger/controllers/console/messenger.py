@@ -12,6 +12,12 @@ from python_bot.common.webhook.message import BotButtonMessage, BotTextMessage, 
 
 
 class ConsoleMessenger(BaseMessenger):
+    def unbind(self):
+        pass
+
+    def bind(self, **kwargs):
+        pass
+
     def on_message(self, user_id, text):
         self._print_caption(t("On message"))
         print_palette(t("Recipient: %s, Text: %s") % (user_id, text), PaletteStyle.text)

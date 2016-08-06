@@ -6,18 +6,21 @@ import requests
 from requests_toolbelt import MultipartEncoder
 
 from python_bot.common.localization.base import t
-from python_bot.common.messenger.controllers.base.messenger import UserInfo
+from python_bot.common.messenger.controllers.base.messenger import UserInfo, BaseMessenger
 from python_bot.common.webhook.message import BotButtonMessage, BotTextMessage, BotImageMessage, \
     BotTypingMessage, BotPersistentMenuMessage
 
 
-class FacebookMessenger(metaclass=abc.ABCMeta):
+class FacebookMessenger(BaseMessenger):
+    def unbind(self):
+        pass
+
+    def bind(self, **kwargs):
+        pass
+
     def __init__(self, access_token=None, api_version=None, on_message_callback=None):
-        self.api_version = api_version
-        self.access_token = access_token
-        self._on_message_callback = on_message_callback
-        self.api_version = api_version
-        self.access_token = access_token
+
+        super().__init__(access_token, api_version, on_message_callback)
         self.base_url = (
             "https://graph.facebook.com"
             "/v{0}/me/messages?access_token={1}"
