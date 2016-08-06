@@ -16,3 +16,6 @@ wit
 # docs and tests
 pytest
 Sphinx
+
+# slack
+slackclient
