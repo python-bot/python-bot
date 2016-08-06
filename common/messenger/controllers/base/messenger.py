@@ -14,8 +14,8 @@ class UserInfo:
     last_name = ""
     profile_pic = ""
     locale = None
-    timezone = None
-    gender = 0
+    timezone = None  # float (min: -24) (max: 24)
+    is_male = True
 
     def __str__(self):
         out = "%s: %s %s " % (self.user_id, self.first_name, self.last_name)

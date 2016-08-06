@@ -135,12 +135,18 @@ class FacebookMessenger(BaseMessenger):
         return self._send_payload(payload)
 
     def get_user_info(self, user_id) -> UserInfo:
-        # todo
-        user_details_url = "https://graph.facebook.com/v2.6/%s" % user_id
-        user_details_params = {'fields': 'first_name,last_name,profile_pic,gender,birthday',
+        user_details_url = "https://graph.facebook.com/v2.7/%s" % user_id
+        user_details_params = {'fields': 'first_name,last_name,gender,locale,timezone',
                                'access_token': self.access_token}
         user_details = requests.get(user_details_url, user_details_params).json()
-        return UserInfo()
+        user = UserInfo()
+        user.is_male = user_details.get("gender") == "male"
+        user.first_name = user_details.get("first_name")
+        user.last_name = user_details.get("last_name")
+        user.locale = user_details.get("locale")
+        user.timezone = user_details.get("timezone")
+        user.profile_pic = "https://graph.facebook.com/%s/picture" % user_id
+        return user
 
     def _send_generic_message(self, user_id, elements):
         payload = {
