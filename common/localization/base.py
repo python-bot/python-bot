@@ -30,15 +30,16 @@ def get_system_encoding():
 DEFAULT_LOCALE_ENCODING = get_system_encoding()
 
 
-def init_localization():
-    '''prepare l10n'''
-    locale.setlocale(locale.LC_ALL, '')  # use user's preferred locale
-    # take first two characters of country code
-    loc = locale.getlocale()
-    filename = os.path.join(LOCALE_DIR, loc[0][:2], "LC_MESSAGES", "python_bot.mo")
+def init_localization(user_locale=None):
+    if not user_locale:
+        locale.setlocale(locale.LC_ALL, '')  # use user's preferred locale
+        # take first two characters of country code
+        loc = locale.getlocale()
+        user_locale = loc[0][:2]
+    filename = os.path.join(LOCALE_DIR, user_locale, "LC_MESSAGES", "python_bot.mo")
 
     try:
-        logging.debug("Opening message file %s for locale %s", filename, loc[0])
+        logging.debug("Opening message file %s for locale %s", filename, user_locale)
         trans = gettext.GNUTranslations(open(filename, "rb"))
     except IOError:
         logging.debug("Locale not found. Using default messages")
@@ -48,6 +49,6 @@ def init_localization():
     return trans
 
 
-trans = init_localization()
-l = trans.lgettext
-t = trans.gettext
+system_trans = init_localization()
+l = system_trans.lgettext
+t = system_trans.gettext
