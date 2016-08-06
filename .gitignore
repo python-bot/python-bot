@@ -1,0 +1,17 @@
+*__pycache__*
+.installed.cfg
+*.pyc
+*.pyo
+bin
+develop-eggs
+dist
+downloads
+eggs
+parts
+src/*.egg-info
+lib
+lib64
+workspace.xml
+*.log
+.idea/
+
