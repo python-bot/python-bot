@@ -5,7 +5,7 @@ import dateutil.parser
 from python_bot.common.localization.base import t
 from python_bot.common.storage.base import UserStorageAdapter
 from python_bot.common.utils.path import load_module
-from python_bot.settings import BOT_SETTINGS
+from python_bot.settings import get_bot_settings
 
 
 class BotRequest:
@@ -16,10 +16,10 @@ class BotRequest:
         self.messenger = messenger
 
     def user_storage(self) -> UserStorageAdapter:
-        params = BOT_SETTINGS["user_storage"].get("params", {})
+        params = get_bot_settings()["user_storage"].get("params", {})
         params["user_id"] = self.user_id
-        if BOT_SETTINGS["user_storage"]:
-            first_item = next(iter(BOT_SETTINGS["user_storage"].items()))
+        if get_bot_settings()["user_storage"]:
+            first_item = next(iter(get_bot_settings()["user_storage"].items()))
             return load_module({"entry": first_item[0], "params": first_item[1]})
 
     def is_positive(self):

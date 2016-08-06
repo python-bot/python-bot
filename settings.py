@@ -2,7 +2,7 @@ import os
 
 LOCALE_DIR = os.path.join(os.path.dirname(__file__), "locale")
 
-BOT_SETTINGS = {
+DEFAULT_BOT_SETTINGS = {
     "messenger": {
         "python_bot.common.messenger.controllers.console.ConsoleMessenger": {}
     }
@@ -18,7 +18,6 @@ BOT_SETTINGS = {
             "use_aliases": True,
             "message_only": True
         },
-        "python_bot.tests.common.middleware.EchoMiddleware": {}
     },
     "tokenizer": {
         "python_bot.common.tokenizer.elasticsearch.ElasticSearchTokenizer": {
@@ -29,17 +28,29 @@ BOT_SETTINGS = {
     }
 }
 
+_user_settings = {}
+_user_settings_changed = True
 
-def main():
-    pass
-    # t = load_module(**BOT_SETTINGS["tokenizer"])
-
-
-    # print(t.analyze_token("собака бывает кусачей"))
-    # emoji_postprocessor()
-    # LocaleMessages().make_messages()
-    # LocaleMessages().compile_messages()
+_settings = {}
 
 
-if __name__ == '__main__':
-    main()
+def set_bot_settings(messenger=None, storage=None, user_storage=None, middleware=None, tokenizer=None):
+    global _user_settings, _user_settings_changed
+    _user_settings.update({
+        "messenger": messenger or {},
+        "storage": storage or {},
+        "user_storage": user_storage or {},
+        "middleware": middleware or {},
+        "tokenizer": tokenizer or {}
+    })
+    _user_settings_changed = True
+
+
+def get_bot_settings():
+    global _settings, _user_settings_changed
+    if _user_settings_changed:
+        _settings = DEFAULT_BOT_SETTINGS.copy()
+        for k in _settings.keys():
+            _settings[k].update(_user_settings.get(k, {}))
+            _user_settings_changed = False
+    return _settings

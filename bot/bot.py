@@ -5,7 +5,7 @@ from python_bot.common.tokenizer.base import BaseTokenizer
 from python_bot.common.utils.misc import lazy
 from python_bot.common.utils.path import load_module
 from python_bot.common.webhook.request import BotRequest
-from python_bot.settings import BOT_SETTINGS
+from python_bot.settings import get_bot_settings
 
 
 class BotHandlerMixIn:
@@ -14,7 +14,7 @@ class BotHandlerMixIn:
     @lazy
     def messengers(self):
         result = []
-        for messenger in BOT_SETTINGS["messenger"]:
+        for messenger in get_bot_settings()["messenger"]:
             params = messenger.get("params", {})
             params["on_message_callback"] = self.on_message
             mod = load_module({"entry": messenger["entry"], "params": params})
@@ -37,14 +37,14 @@ class BotHandlerMixIn:
 class PythonBot(LocalizationMixIn, MiddlewareHandlerMixIn, BotHandlerMixIn):
     @lazy
     def storage(self) -> StorageAdapter:
-        if BOT_SETTINGS["storage"]:
-            first_item = next(iter(BOT_SETTINGS["storage"].items()))
+        if get_bot_settings()["storage"]:
+            first_item = next(iter(get_bot_settings()["storage"].items()))
             return load_module({"entry": first_item[0], "params": first_item[1]})
 
     @lazy
     def tokenizer(self) -> BaseTokenizer:
-        if BOT_SETTINGS["tokenizer"]:
-            first_item = next(iter(BOT_SETTINGS["tokenizer"].items()))
+        if get_bot_settings()["tokenizer"]:
+            first_item = next(iter(get_bot_settings()["tokenizer"].items()))
             return load_module({"entry": first_item[0], "params": first_item[1]})
 
 

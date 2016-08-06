@@ -60,13 +60,13 @@ class BaseMessenger(metaclass=abc.ABCMeta):
     def get_user_info(self, user_id) -> UserInfo:
         pass
 
-    def on_message(self, user_id, incoming_message):
-        request = self.get_request(user_id, incoming_message)
+    def on_message(self, user_id, text):
+        request = self.get_request(user_id, text)
         if callable(self._on_message_callback):
             return self._on_message_callback(request)
 
-    def get_request(self, user_id, incoming_message):
-        return BotRequest(messenger=self, user_id=user_id, text=incoming_message)
+    def get_request(self, user_id, text):
+        return BotRequest(messenger=self, user_id=user_id, text=text)
 
     def handle(self, messages: list):
         for message in messages:

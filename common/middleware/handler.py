@@ -1,7 +1,7 @@
 from python_bot.common.utils.misc import lazy
 from python_bot.common.utils.path import load_module
 from python_bot.common.webhook.message import BotMessage
-from python_bot.settings import BOT_SETTINGS
+from python_bot.settings import get_bot_settings
 
 
 class MiddlewareHandlerMixIn(object):
@@ -14,8 +14,8 @@ class MiddlewareHandlerMixIn(object):
             return self._middleware_chain
 
         handler = self._get_message
-        for middleware in reversed(list(BOT_SETTINGS["middleware"].keys())):
-            params = BOT_SETTINGS["middleware"][middleware]
+        for middleware in reversed(list(get_bot_settings()["middleware"].keys())):
+            params = get_bot_settings()["middleware"][middleware]
             params["get_message"] = handler
 
             handler = load_module({"entry": middleware, "params": params})

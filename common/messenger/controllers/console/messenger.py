@@ -12,10 +12,10 @@ from python_bot.common.webhook.message import BotButtonMessage, BotTextMessage, 
 
 
 class ConsoleMessenger(BaseMessenger):
-    def on_message(self, user_id, incoming_message):
+    def on_message(self, user_id, text):
         self._print_caption(t("On message"))
-        print_palette(t("Recipient: %s, Text: %s") % (user_id, incoming_message), PaletteStyle.text)
-        return super().on_message(user_id, incoming_message)
+        print_palette(t("Recipient: %s, Text: %s") % (user_id, text), PaletteStyle.text)
+        return super().on_message(user_id, text)
 
     def send_button(self, message: BotButtonMessage):
         self._print_caption(t("Send button:"))
