@@ -1,31 +1,23 @@
 import os
+from collections import OrderedDict
 
 LOCALE_DIR = os.path.join(os.path.dirname(__file__), "locale")
 
 DEFAULT_BOT_SETTINGS = {
-    "messenger": {
-        "python_bot.common.messenger.controllers.console.ConsoleMessenger": {}
-    }
-    ,
-    "storage": {
+    "messenger": OrderedDict(),
+    "storage": OrderedDict({
         "python_bot.common.storage.json_database.JsonDatabaseAdapter": {}
-    },
-    "user_storage": {
+    }),
+    "user_storage": OrderedDict({
         "python_bot.common.storage.json_database.UserJsonDatabaseAdapter": {}
-    },
-    "middleware": {
+    }),
+    "middleware": OrderedDict({
         "python_bot.common.middleware.emoji.EmojiMiddleware": {
             "use_aliases": True,
             "message_only": True
         },
-    },
-    "tokenizer": {
-        "python_bot.common.tokenizer.elasticsearch.ElasticSearchTokenizer": {
-            "server": "pressandgetdb.westeurope.cloudapp.azure.com",
-            "index": "ka4me_actions",
-            "field": "name.exact_name",
-        }
-    }
+    }),
+    "tokenizer": OrderedDict()
 }
 
 _user_settings = {}

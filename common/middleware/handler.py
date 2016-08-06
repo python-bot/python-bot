@@ -16,9 +16,13 @@ class MiddlewareHandlerMixIn(object):
         handler = self._get_message
         for middleware in reversed(list(get_bot_settings()["middleware"].keys())):
             params = get_bot_settings()["middleware"][middleware]
-            params["get_message"] = handler
+            if callable(params):
+                # simple middleware case
+                handler = params(get_message=handler)
+            else:
+                params["get_message"] = handler
 
-            handler = load_module({"entry": middleware, "params": params})
+                handler = load_module({"entry": middleware, "params": params})
 
         # We only assign to this when initialization is complete as it is used
         # as a flag for initialization being complete.
