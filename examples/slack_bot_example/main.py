@@ -1,14 +1,14 @@
-from python_bot.bot.bot import PythonBot
-from python_bot.common.messenger.controllers.console import ConsoleMessenger
-from python_bot.settings import set_bot_settings
+import time
+from slackclient import SlackClient
 
-# Adding echo middleware which send message to bot the same as request
-set_bot_settings(middleware={"python_bot.tests.common.middleware.EchoMiddleware": {}}, messenger={})
-
-
-bot = PythonBot()
-
-console_messenger_request = ConsoleMessenger().get_request(user_id=1, text="test")
-
-# Simulate on message event
-bot.on_message(console_messenger_request)
+token = "xoxb-66919509936-ks52a9VQDoFp9KzxYZHTIHYQ"  # found at https://api.slack.com/web#authentication
+sc = SlackClient(token)
+if sc.rtm_connect():
+    while True:
+        for message in sc.rtm_read():
+            if message.get("type") == "message":
+                self.on_message(user_id=message["user"], text=message["text"], channel=message["channel"])
+        print(sc.rtm_read())
+        time.sleep(1)
+else:
+    print("Connection Failed, invalid token?")

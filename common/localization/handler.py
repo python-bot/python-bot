@@ -4,6 +4,7 @@ from python_bot.common.localization.base import init_localization, system_trans
 class LocalizationMixIn(object):
     def __init__(self):
         self._trans = system_trans
+        super().__init__()
 
     @staticmethod
     def locale_make(**kwargs):

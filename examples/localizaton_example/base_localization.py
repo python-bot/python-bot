@@ -1,4 +1,4 @@
-from python_bot.bot.bot import PythonBot
+from python_bot.bot import PythonBot
 
 bot = PythonBot()
 

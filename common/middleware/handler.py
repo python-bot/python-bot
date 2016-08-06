@@ -1,12 +1,12 @@
 from python_bot.common.utils.misc import lazy
 from python_bot.common.utils.path import load_module
-from python_bot.common.webhook.message import BotMessage
 from python_bot.settings import get_bot_settings
 
 
 class MiddlewareHandlerMixIn(object):
     def __init__(self):
         self._middleware_chain = None
+        super().__init__()
 
     @lazy
     def middleware(self):

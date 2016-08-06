@@ -1,4 +1,4 @@
-from python_bot.bot.bot import PythonBot
+from python_bot.bot import PythonBot
 from python_bot.common.messenger.controllers.console import ConsoleMessenger
 from python_bot.settings import set_bot_settings
 
