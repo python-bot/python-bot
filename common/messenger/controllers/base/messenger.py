@@ -41,6 +41,14 @@ class BaseMessenger(metaclass=abc.ABCMeta):
     #     pass
 
     @abc.abstractmethod
+    def bind(self, **kwargs):
+        pass
+
+    @abc.abstractmethod
+    def unbind(self):
+        pass
+
+    @abc.abstractmethod
     def send_button(self, message: BotButtonMessage):
         pass
 

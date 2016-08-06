@@ -1,6 +1,6 @@
 python-dateutil
 requests
-
+requests_toolbelt
 
 # optional packages
 emoji

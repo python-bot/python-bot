@@ -8,8 +8,10 @@ class BotMessage:
 
 
 class BotButtonMessage(BotMessage):
-    def __init__(self, request, text, buttons):
+    def __init__(self, request, text, buttons=None):
         super().__init__(request)
+        if not buttons:
+            buttons = []
         self.buttons = buttons
         self.text = text
 
@@ -33,6 +35,8 @@ class BotImageMessage(BotMessage):
 class BotPersistentMenuMessage(BotMessage):
     def __init__(self, request, call_to_actions=None):
         super().__init__(request)
+        if not call_to_actions:
+            call_to_actions = []
         self.call_to_actions = call_to_actions
 
 
