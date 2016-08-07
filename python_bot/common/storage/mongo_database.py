@@ -36,7 +36,7 @@ class MongoDatabaseAdapter(StorageAdapter):
     def count(self, filter_func=None):
         return len(self._keys(filter_func))
 
-    def find(self, statement_text):
+    def get(self, statement_text):
         values = self.database.find_one({'key': statement_text})
 
         if not values:
@@ -81,7 +81,7 @@ class MongoDatabaseAdapter(StorageAdapter):
 
         filter_parameters.update(contains_parameters)
 
-        matches = self.statements.find(filter_parameters)
+        matches = self.statements.get(filter_parameters)
         matches = list(matches)
 
         results = []
@@ -138,7 +138,7 @@ class MongoDatabaseAdapter(StorageAdapter):
         if self.count() < 1:
             raise self.EmptyDatabaseException()
 
-        statement = self.statements.find().limit(1).skip(random_integer)
+        statement = self.statements.get().limit(1).skip(random_integer)
 
         values = list(statement)[0]
         statement_text = values['text']

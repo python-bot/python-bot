@@ -42,7 +42,7 @@ class StorageAdapter(Adapter):
         pass
 
     @abc.abstractmethod
-    def find(self, statement_text):
+    def get(self, statement_text):
         """
         Returns a object from the database if it exists
         """
@@ -133,5 +133,5 @@ class UserStorageAdapter(StorageAdapter):
     def get_random(self, key):
         return super().get_random(self._format_key(key))
 
-    def find(self, key):
-        return super().find(self._format_key(key))
+    def get(self, key):
+        return super().get(self._format_key(key))

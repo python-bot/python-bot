@@ -22,7 +22,7 @@ class JsonDatabaseAdapter(StorageAdapter):
     def count(self, filter_func=None):
         return len(self._keys(filter_func))
 
-    def find(self, statement_text):
+    def get(self, statement_text):
         values = self.database.data(key=statement_text)
 
         if not values:
@@ -89,7 +89,7 @@ class JsonDatabaseAdapter(StorageAdapter):
             raise self.EmptyDatabaseException()
 
         statement = choice(self._keys())
-        return self.find(statement)
+        return self.get(statement)
 
     def drop(self):
         """

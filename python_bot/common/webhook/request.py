@@ -4,6 +4,7 @@ import dateutil.parser
 
 from python_bot.common.localization.base import t
 from python_bot.common.storage.base import UserStorageAdapter
+from python_bot.common.utils.misc import lazy
 from python_bot.common.utils.path import load_module
 
 
@@ -14,6 +15,7 @@ class BotRequest:
         self.user_id = user_id
         self.messenger = messenger
 
+    @lazy
     def user_storage(self) -> UserStorageAdapter:
         params = self.messenger.bot.settings["user_storage"].get("params", {})
         params["user_id"] = self.user_id

@@ -1,25 +1,24 @@
 from wit import Wit
-access_token = "YD75LLWGUB4GZPTHTZNWDURHMTHHELIR"
 
-def send(request, message):
-    print('Sending to user...', message['text'])
-
-
-def my_action(request):
-    print('Received from user...', request['text'])
+from python_bot.common.middleware.base import MiddlewareMixin
+from python_bot.common.webhook.request import BotRequest
 
 
-actions = {
-    'send': send,
-    'my_action': my_action,
-}
+class WitMiddleware(MiddlewareMixin):
+    WIT_DATA_KEY = "_wit"
+    WIT_CONTEXT_KEY = "_context"
 
-client = Wit(access_token=access_token, actions=actions)
+    def __init__(self, *args, **kwargs):
+        self.access_token = kwargs.pop("access_token", None)
+        self.actions = kwargs.pop("actions", {})
+        self.client = Wit(access_token=self.access_token, actions=self.actions)
+        super().__init__(*args, **kwargs)
 
-session_id = 'my-user-session-42'
-context0 = {}
-context1 = client.run_actions(session_id, 'what is the weather in London?', context0)
-print('The session state is now: ' + str(context1))
-context2 = client.run_actions(session_id, 'and in Brussels?', context1)
-print('The session state is now: ' + str(context2))
+    def process_request(self, request: BotRequest):
+        if request.text:
+            user_data = request.user_storage().get(request.user_id)
+            wit_data = user_data.get(self.WIT_DATA_KEY, {})
+            context = wit_data.get(self.WIT_CONTEXT_KEY, {})
 
+            result_context = self.client.run_actions(str(request.user_id), request.text, context)
+            wit_data[self.WIT_CONTEXT_KEY] = result_context
