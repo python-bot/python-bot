@@ -1,8 +1,5 @@
 import abc
 
-from python_bot.common.localization.base import t
-
-
 class Adapter(metaclass=abc.ABCMeta):
     """
     An abstract superclass for all adapters
@@ -91,7 +88,7 @@ class StorageAdapter(Adapter):
         pass
 
     class EmptyDatabaseException(Exception):
-        def __init__(self, value=t("The database currently contains no entries. At least one entry is expected.")):
+        def __init__(self, value="The database currently contains no entries. At least one entry is expected."):
             self.value = value
 
         def __str__(self):

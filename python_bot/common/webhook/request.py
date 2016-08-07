@@ -2,7 +2,7 @@ import re
 
 import dateutil.parser
 
-from python_bot.common.localization.base import t
+from gettext import gettext as _
 from python_bot.common.storage.base import UserStorageAdapter
 from python_bot.common.utils.misc import lazy
 from python_bot.common.utils.path import load_module
@@ -25,7 +25,7 @@ class BotRequest:
 
     def is_positive(self):
         return any(filter(lambda x: x in self.text.lower().split(),
-                          [t("yes"), t("sure"), t("true"), t("of course"), t("certainly"), t("clearly")]))
+                          [_("yes"), _("sure"), _("true"), _("of course"), _("certainly"), _("clearly")]))
 
     def is_negative(self):
         return not self.is_positive()

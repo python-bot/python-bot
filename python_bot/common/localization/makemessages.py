@@ -122,6 +122,7 @@ class LocaleMessages:
         "extensions": [],
         "exclude": [],
         "locale": [],
+        "locale_paths": [],
         "all": False,
         "domain": "python_bot",
         'verbosity': 0
@@ -168,22 +169,19 @@ class LocaleMessages:
                 % (os.path.basename(sys.argv[0]), sys.argv[1])
             )
 
-        self.invoked_for_django = False
-        self.locale_paths = []
+        self.locale_paths = self.options['locale_paths']
         self.default_locale_path = None
-        if os.path.isdir(os.path.join('conf', 'locale')):
-            self.locale_paths = [os.path.abspath(os.path.join('conf', 'locale'))]
+
+        # self.locale_paths.extend([settings.LOCALE_DIR])
+        # Allow to run makemessages inside an app dir
+        if os.path.isdir('locale'):
+            self.locale_paths.append(os.path.abspath('locale'))
+
+        if self.locale_paths:
+            self.locale_paths = list(set(self.locale_paths))
             self.default_locale_path = self.locale_paths[0]
-            self.invoked_for_django = True
-        else:
-            self.locale_paths.extend([settings.LOCALE_DIR])
-            # Allow to run makemessages inside an app dir
-            if os.path.isdir('locale'):
-                self.locale_paths.append(os.path.abspath('locale'))
-            if self.locale_paths:
-                self.default_locale_path = self.locale_paths[0]
-                if not os.path.exists(self.default_locale_path):
-                    os.makedirs(self.default_locale_path)
+            if not os.path.exists(self.default_locale_path):
+                os.makedirs(self.default_locale_path)
 
         # Build locale list
         locale_dirs = filter(os.path.isdir, glob.glob('%s/*' % self.default_locale_path))
@@ -227,9 +225,9 @@ class LocaleMessages:
 
     def compile_messages(self):
         if self.locales:
-            dirs = [os.path.join(settings.LOCALE_DIR, l, 'LC_MESSAGES') for l in self.locales]
+            dirs = [os.path.join(d, l, 'LC_MESSAGES') for l in self.locales for d in self.locale_paths]
         else:
-            dirs = [settings.LOCALE_DIR]
+            dirs = self.locale_paths
 
         locations = []
         for ldir in dirs:
@@ -404,6 +402,7 @@ class LocaleMessages:
             '--language=Python',
             '--keyword=gettext_noop',
             '--keyword=gettext_lazy',
+            '--keyword=localize_message',
             '--keyword=ngettext_lazy:1,2',
             '--keyword=ugettext_noop',
             '--keyword=ugettext_lazy',

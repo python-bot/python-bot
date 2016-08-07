@@ -1,11 +1,16 @@
+import os
+
 from python_bot.bot import PythonBot
 
-bot = PythonBot()
+# In this example we will work with localization our messages
+# to make and compile messages use
+# bot.locale_make()
+# bot.locale_compile()
 
-# make and compile message
-# bot.locale_make(locale=["ru"])
-# bot.locale_compile(locale=["ru"])
+locale_path = os.path.join(os.path.dirname(__file__), "locale")
+bot = PythonBot(locale={"path": locale_path})
 
+assert bot.localize_message("Test") == "Test"
 bot.switch_locale("ru")
 
-print(bot.localize_message("Yes"))
+assert bot.localize_message("Test") == "Тест"

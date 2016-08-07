@@ -38,13 +38,16 @@ class BotHandlerMixIn:
 
 
 class PythonBot(LocalizationMixIn, MiddlewareHandlerMixIn, BotHandlerMixIn):
-    def __init__(self, messenger=None, storage=None, user_storage=None, middleware=None, tokenizer=None):
+    def __init__(self,
+                 messenger=None, storage=None, user_storage=None,
+                 middleware=None, tokenizer=None, locale=None):
         self._user_settings = {
             "messenger": messenger or OrderedDict(),
             "storage": storage or OrderedDict(),
             "user_storage": user_storage or OrderedDict(),
             "middleware": middleware or OrderedDict(),
-            "tokenizer": tokenizer or OrderedDict()
+            "tokenizer": tokenizer or OrderedDict(),
+            "locale": locale or OrderedDict()
         }
         super().__init__()
 
@@ -57,14 +60,14 @@ class PythonBot(LocalizationMixIn, MiddlewareHandlerMixIn, BotHandlerMixIn):
 
     @lazy
     def storage(self) -> StorageAdapter:
-        if get_bot_settings()["storage"]:
-            first_item = next(iter(get_bot_settings()["storage"].items()))
+        if self.settings["storage"]:
+            first_item = next(iter(self.settings["storage"].items()))
             return load_module({"entry": first_item[0], "params": first_item[1]})
 
     @lazy
     def tokenizer(self) -> BaseTokenizer:
-        if get_bot_settings()["tokenizer"]:
-            first_item = next(iter(get_bot_settings()["tokenizer"].items()))
+        if self.settings["tokenizer"]:
+            first_item = next(iter(self.settings["tokenizer"].items()))
             return load_module({"entry": first_item[0], "params": first_item[1]})
 
 

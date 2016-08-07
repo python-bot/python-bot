@@ -17,5 +17,9 @@ DEFAULT_BOT_SETTINGS = {
             "message_only": True
         },
     }),
-    "tokenizer": OrderedDict()
+    "tokenizer": OrderedDict(),
+    "locale": {
+        "lang": "en",
+        "path": LOCALE_DIR
+    }
 }

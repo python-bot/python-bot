@@ -30,13 +30,16 @@ def get_system_encoding():
 DEFAULT_LOCALE_ENCODING = get_system_encoding()
 
 
-def init_localization(user_locale=None):
+def init_localization(user_locale=None, path=None):
     if not user_locale:
         locale.setlocale(locale.LC_ALL, '')  # use user's preferred locale
         # take first two characters of country code
         loc = locale.getlocale()
         user_locale = loc[0][:2]
-    filename = os.path.join(LOCALE_DIR, user_locale, "LC_MESSAGES", "python_bot.mo")
+    if not path:
+        filename = os.path.join(LOCALE_DIR, user_locale, "LC_MESSAGES", "python_bot.mo")
+    else:
+        filename = os.path.join(path, user_locale, "LC_MESSAGES", "python_bot.mo")
 
     try:
         logging.debug("Opening message file %s for locale %s", filename, user_locale)
@@ -47,8 +50,3 @@ def init_localization(user_locale=None):
 
     trans.install()
     return trans
-
-
-system_trans = init_localization()
-l = system_trans.lgettext
-t = system_trans.gettext
