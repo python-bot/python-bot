@@ -51,7 +51,7 @@ class ConsoleMessenger(BaseMessenger):
         result.user_id = user_id
         result.first_name = getpass.getuser()
         result.locale = locale.getlocale()[0]
-        result.timezone = strftime("%z", gmtime())
+        result.timezone = int(strftime("%z", gmtime())) / 100
 
         self._print_caption(t("User info:"))
         print_palette(result, PaletteStyle.text)

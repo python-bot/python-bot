@@ -27,10 +27,11 @@ class UserInfo:
 
 
 class BaseMessenger(metaclass=abc.ABCMeta):
-    def __init__(self, access_token=None, api_version=None, on_message_callback=None):
+    def __init__(self, access_token=None, api_version=None, on_message_callback=None, bot=None):
         self.api_version = api_version
         self.access_token = access_token
         self._on_message_callback = on_message_callback
+        self.bot = bot
 
     @abc.abstractmethod
     def send_text_message(self, message: BotTextMessage):

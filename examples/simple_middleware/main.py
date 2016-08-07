@@ -1,7 +1,6 @@
 from python_bot.bot import PythonBot
 from python_bot.common.messenger.controllers.console import ConsoleMessenger
 from python_bot.common.webhook.message import BotTextMessage
-from python_bot.settings import set_bot_settings
 
 
 def echo_middleware(get_message):
@@ -20,11 +19,12 @@ def echo_middleware(get_message):
 
     return middleware
 
-# Adding echo middleware which send message to bot the same as request
-set_bot_settings(middleware={"echo_middleware": echo_middleware},
-                 messenger={"python_bot.common.messenger.controllers.console.ConsoleMessenger": {}})
 
-bot = PythonBot()
+# Adding echo middleware which send message to bot the same as request
+bot = PythonBot(
+    middleware={"echo_middleware": echo_middleware},
+    messenger={"python_bot.common.messenger.controllers.console.ConsoleMessenger": {}}
+)
 console_messenger_request = ConsoleMessenger().get_request(user_id=1, text="test")
 
 # Simulate on message event

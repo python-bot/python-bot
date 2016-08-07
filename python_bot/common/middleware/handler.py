@@ -1,6 +1,5 @@
 from python_bot.common.utils.misc import lazy
 from python_bot.common.utils.path import load_module
-from python_bot.settings import get_bot_settings
 
 
 class MiddlewareHandlerMixIn(object):
@@ -14,8 +13,8 @@ class MiddlewareHandlerMixIn(object):
             return self._middleware_chain
 
         handler = self._get_message
-        for middleware in reversed(list(get_bot_settings()["middleware"].keys())):
-            params = get_bot_settings()["middleware"][middleware]
+        for middleware in reversed(list(self.settings["middleware"].keys())):
+            params = self.settings["middleware"][middleware]
             if callable(params):
                 # simple middleware case
                 handler = params(get_message=handler)
