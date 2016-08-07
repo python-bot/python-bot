@@ -39,7 +39,7 @@ Now that you have a local copy of Python Bot.
 Create a new virtualenv by running:
 
 ```
-    $ python3 -m venv ~/.virtualenvs/python-bot
+    $ python3 -m venv ~/.virtualenvs/python_bot
 ```
 
 The path is where the new environment will be saved on your computer.
