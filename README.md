@@ -1,15 +1,15 @@
 
 # Introduction
 
-This library provides a pure Python interface for the
-`Messenger Bot API such as Facebook, Telegram, Slack.`. Feel free to add and contribute other.
+This library provides a pure Python interface for the Messenger Bot API such as
+` Facebook, Telegram, Slack.` all in one. Feel free to add other messenger support.
 
 In addition to the pure API implementation, this library features a number of high-level classes to
 make the development of bots easy and straightforward.
 
 # Learning by example
-We believe that the best way to learn and understand this simple package is by example. 
-So here are some examples for you to review [this url](https://github.com/python-bot/python-bot/tree/master/examples)
+The best way to learn and understand this simple package is by example. 
+So here are some examples for you to [review this url](https://github.com/python-bot/python-bot/tree/master/examples)
 
 # Installing
 
@@ -48,24 +48,24 @@ The path is where the new environment will be saved on your computer.
 >   ``virtualenv`` package instead, first making sure you have ``pip3``:
 
 ```
-
-        $ sudo apt-get install python3-pip
-        $ # Prefix the next command with sudo if it gives a permission denied error
-        $ pip3 install virtualenv
-        $ virtualenv --python=`which python3` ~/.virtualenvs/python-botdev
+    $ sudo apt-get install python3-pip
+    $ # Prefix the next command with sudo if it gives a permission denied error
+    $ pip3 install virtualenv
+    $ virtualenv --python=`which python3` ~/.virtualenvs/python_bot
 ```
 
 The final step in setting up your virtualenv is to activate it:
 
 ```
-    $ source ~/.virtualenvs/python-botdev/bin/activate
+    $ source ~/.virtualenvs/python_bot/bin/activate
 ```
 
 The installed version of Python Bot is now pointing at your local copy.
 
-## Contributing
+## Contributing 
 
-Contributions of all sizes are welcome. You can also help by [reporting bugs](https://github.com/python-bot/python-bot/issues/new).
+Contributions of all sizes are welcome:coffee:. You can also help by [reporting bugs](https://github.com/python-bot/python-bot/issues/new).
+It would be very helpful.
 
 ## License
 You may copy, distribute and modify the software provided that modifications are described and licensed for free under [LGPL-3](https://www.gnu.org/licenses/lgpl-3.0.html). Derivatives works (including modifications or anything statically linked to the library) 
