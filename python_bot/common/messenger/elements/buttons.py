@@ -1,7 +1,7 @@
 import abc
 import json
 
-from python_bot.common.localization.base import t
+from gettext import  gettext as _
 
 
 class Button(metaclass=abc.ABCMeta):
@@ -12,7 +12,7 @@ class Button(metaclass=abc.ABCMeta):
 
     def __init__(self, title):
         if len(title) > 20:
-            raise ValueError(t('Button title limit is 20 characters'))
+            raise ValueError(_('Button title limit is 20 characters'))
         self.title = title
 
     def to_dict(self):
@@ -38,8 +38,8 @@ class PhoneNumberButton(Button):
 
     def __init__(self, title, phone_number):
         if not phone_number or phone_number[0] != "+":
-            raise ValueError('Phone_number payload format mush be ‘+’ prefix followed by the country code, '
-                             'area code and local number')
+            raise ValueError(_('Phone_number payload format mush be ‘+’ prefix followed by the country code, '
+                             'area code and local number'))
         super().__init__(title=title)
 
 
@@ -79,18 +79,12 @@ class QuickReply(object):
         return json.dumps(self.to_dict())
 
 
-YES_BUTTON = QuickReply(t("Да"), "yes")
-NO_BUTTON = QuickReply(t("Нет"), "no")
+YES_BUTTON = QuickReply(_("Yes"), "yes")
+NO_BUTTON = QuickReply(_("No"), "no")
 
-MALE_BUTTON = QuickReply(t("Мужской"), "male")
-FEMALE_BUTTON = QuickReply(t("Женский"), "female")
+MALE_BUTTON = QuickReply(_("Male"), "male")
+FEMALE_BUTTON = QuickReply(_("Female"), "female")
 
 YES_NO_BUTTONS = [YES_BUTTON, NO_BUTTON]
 
 GENDER_BUTTONS = [MALE_BUTTON, FEMALE_BUTTON]
-
-BUILD_MUSCLE = QuickReply(t("Набор массы"), "Набор массы")
-
-LOSE_FAT = QuickReply(t("Похудеть"), "Похудеть")
-
-TRAINING_TYPE_BUTTONS = [BUILD_MUSCLE, LOSE_FAT]

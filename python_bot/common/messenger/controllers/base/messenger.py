@@ -2,7 +2,7 @@ import abc
 import json
 import os
 
-from python_bot.common.localization.base import t
+from gettext import gettext as _
 from python_bot.common.webhook.request import BotRequest
 from python_bot.common.webhook.message import BotButtonMessage, BotTextMessage, BotImageMessage, \
     BotTypingMessage, BotPersistentMenuMessage, BotMessage
@@ -20,9 +20,9 @@ class UserInfo:
     def __str__(self):
         out = "%s: %s %s " % (self.user_id, self.first_name, self.last_name)
         if self.locale:
-            out += os.linesep + t("Locale: ") + self.locale
+            out += os.linesep + _("Locale: ") + self.locale
         if self.timezone:
-            out += os.linesep + t("Timezone: ") + str(self.timezone)
+            out += os.linesep + _("Timezone: ") + str(self.timezone)
         return out
 
 

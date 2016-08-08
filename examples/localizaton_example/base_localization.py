@@ -8,9 +8,7 @@ from python_bot.bot import PythonBot
 # bot.locale_compile()
 
 locale_path = os.path.join(os.path.dirname(__file__), "locale")
-bot = PythonBot(locale={"path": locale_path})
-
-assert bot.localize_message("Test") == "Test"
-bot.switch_locale("ru")
-
-assert bot.localize_message("Test") == "Тест"
+with PythonBot(locale={"path": locale_path}) as bot:
+    assert bot.localize_message("Test") == "Test"
+    bot.switch_locale("ru")
+    assert bot.localize_message("Test") == "Тест"

@@ -1,5 +1,7 @@
 from collections import OrderedDict
 
+import time
+
 from python_bot.common.localization.handler import LocalizationMixIn
 from python_bot.common.middleware.handler import MiddlewareHandlerMixIn
 from python_bot.common.storage.base import StorageAdapter
@@ -16,21 +18,38 @@ class BotHandlerMixIn:
     @lazy
     def messengers(self):
         result = []
-        for messenger in self.settings["messenger"]:
-            params = messenger.get("params", {})
-            params["on_message_callback"] = self.on_message
+        for entry, params in self.settings["messenger"].items():
+            if "on_message_callback" in params:
+                params["on_message_callback"] = self.on_message
             params["bot"] = self
-            mod = load_module({"entry": messenger["entry"], "params": params})
+            mod = load_module({"entry": entry, "params": params})
             result.append(mod)
         return result
 
     def bind(self):
         for messenger in self.messengers:
-            messenger.bind(self)
+            messenger.bind()
 
     def unbind(self):
         for messenger in self.messengers:
-            messenger.unbind(self)
+            messenger.unbind()
+
+    def wait(self):
+        while True:
+            time.sleep(0.3)
+
+    def converse(self, quit="quit"):
+        user_input = ""
+        while user_input != quit:
+            user_input = quit
+            try:
+                user_input = input(">")
+            except EOFError:
+                print(user_input)
+            if user_input:
+                from python_bot.common.messenger.controllers.console import ConsoleMessenger
+                request = ConsoleMessenger().get_request(1, user_input)
+                self.on_message(request)
 
     def on_message(self, request: BotRequest):
         message = self.get_message(request)
@@ -69,6 +88,13 @@ class PythonBot(LocalizationMixIn, MiddlewareHandlerMixIn, BotHandlerMixIn):
         if self.settings["tokenizer"]:
             first_item = next(iter(self.settings["tokenizer"].items()))
             return load_module({"entry": first_item[0], "params": first_item[1]})
+
+    def __enter__(self):
+        self.bind()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.unbind()
 
 
 if __name__ == "__main__":
