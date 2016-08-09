@@ -18,12 +18,25 @@ class BotHandlerMixIn:
     @lazy
     def messengers(self):
         result = []
-        for entry, params in self.settings["messenger"].items():
+        for entry in self.settings["messenger"]:
+            if isinstance(entry, (list, tuple)):
+                params = entry[1]
+                entry = entry[0]
+            else:
+                params = {}
+
             if "on_message_callback" in params:
                 params["on_message_callback"] = self.on_message
             params["bot"] = self
-            mod = load_module({"entry": entry, "params": params})
-            result.append(mod)
+
+            mod = None
+            if isinstance(entry, str):
+                mod = load_module({"entry": entry, "params": params})
+            elif callable(entry):
+                mod = entry(**params)
+
+            if mod:
+                result.append(mod)
         return result
 
     def bind(self):
@@ -74,7 +87,12 @@ class PythonBot(LocalizationMixIn, MiddlewareHandlerMixIn, BotHandlerMixIn):
     def settings(self):
         _settings = DEFAULT_BOT_SETTINGS.copy()
         for k in _settings.keys():
-            _settings[k].update(self._user_settings.get(k, {}))
+            if isinstance(_settings[k], (dict, OrderedDict)):
+                _settings[k].update(self._user_settings.get(k, {}))
+            elif isinstance(_settings[k], list):
+                _settings[k] += self._user_settings.get(k, [])
+            else:
+                _settings[k] = self._user_settings.get(k, None)
         return _settings
 
     @lazy

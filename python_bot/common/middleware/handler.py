@@ -13,15 +13,19 @@ class MiddlewareHandlerMixIn(object):
             return self._middleware_chain
 
         handler = self._get_message
-        for middleware in reversed(list(self.settings["middleware"].keys())):
-            params = self.settings["middleware"][middleware]
-            if callable(params):
-                # simple middleware case
-                handler = params(get_message=handler)
-            else:
-                params["get_message"] = handler
+        for middleware in self.settings["middleware"]:
+            params = {"get_message": handler}
+            if isinstance(middleware, (list, tuple)):
+                params.update(middleware[1])
+                middleware = middleware[0]
 
+            if callable(middleware):
+                # simple middleware case
+                handler = middleware(**params)
+            elif isinstance(middleware, str):
                 handler = load_module({"entry": middleware, "params": params})
+            else:
+                raise ValueError("Wrong middleware type")
 
         # We only assign to this when initialization is complete as it is used
         # as a flag for initialization being complete.

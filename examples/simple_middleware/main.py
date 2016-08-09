@@ -21,11 +21,11 @@ def echo_middleware(get_message):
 
 
 # Adding echo middleware which send message to bot the same as request
-bot = PythonBot(
-    middleware={"echo_middleware": echo_middleware},
-    messenger={"python_bot.common.messenger.controllers.console.ConsoleMessenger": {}}
-)
-console_messenger_request = ConsoleMessenger().get_request(user_id=1, text="test")
+with PythonBot(
+    middleware=[echo_middleware],
+    messenger=[]
+) as bot:
+    console_messenger_request = ConsoleMessenger().get_request(user_id=1, text="test")
 
-# Simulate on message event
-bot.on_message(console_messenger_request)
+    # Simulate on message event
+    bot.on_message(console_messenger_request)
