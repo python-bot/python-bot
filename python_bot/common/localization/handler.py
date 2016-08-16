@@ -1,7 +1,7 @@
 from python_bot.common.localization.base import init_localization
 
 
-class LocalizationMixIn(object):
+class LocalizationMixIn:
     def __init__(self):
         self._trans = None
         super().__init__()

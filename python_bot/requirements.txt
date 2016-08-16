@@ -19,4 +19,4 @@ Sphinx
 
 # clients
 slackclient
-telebot
+pyTelegramBotAPI

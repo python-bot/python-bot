@@ -3,6 +3,8 @@ from collections import OrderedDict
 
 import time
 
+import sys
+
 from python_bot.common.localization.handler import LocalizationMixIn
 from python_bot.common.middleware.handler import MiddlewareHandlerMixIn
 from python_bot.common.storage.base import StorageAdapter
@@ -69,6 +71,18 @@ class BotHandlerMixIn:
         return request.messenger.handle(message)
 
 
+bot_logger = logging.getLogger('PythonBot')
+_formatter = logging.Formatter(
+    '%(asctime)s (%(filename)s:%(lineno)d %(threadName)s) %(levelname)s - %(name)s: "%(message)s"'
+)
+
+console_output_handler = logging.StreamHandler(sys.stderr)
+console_output_handler.setFormatter(_formatter)
+bot_logger.addHandler(console_output_handler)
+
+bot_logger.setLevel(logging.ERROR)
+
+
 class PythonBot(LocalizationMixIn, MiddlewareHandlerMixIn, BotHandlerMixIn):
     def __init__(self,
                  messenger=None, storage=None, user_storage=None,
@@ -82,6 +96,9 @@ class PythonBot(LocalizationMixIn, MiddlewareHandlerMixIn, BotHandlerMixIn):
             "locale": locale or OrderedDict()
         }
         super().__init__()
+
+    def on_exception(self, exc, request: BotRequest):
+        bot_logger.error(exc)
 
     @staticmethod
     def setup_logging(**kwargs):
