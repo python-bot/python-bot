@@ -1,5 +1,6 @@
 import getpass
 import locale
+import logging
 import os
 from time import strftime, gmtime
 
@@ -36,7 +37,7 @@ class ConsoleMessenger(BaseMessenger):
 
     def send_typing(self, message: BotTypingMessage):
         self._print_caption(_("Typing:"))
-        print_palette(_("Typing is set to %s") % (_("on") if message.on else t("off")), PaletteStyle.typing)
+        print_palette(_("Typing is set to %s") % (_("on") if message.on else _("off")), PaletteStyle.typing)
 
     def set_persistent_menu(self, message: BotPersistentMenuMessage):
         self._print_caption(_("Set persistent menu: "))
@@ -66,11 +67,3 @@ class ConsoleMessenger(BaseMessenger):
     @staticmethod
     def _print_caption(text):
         print_palette(os.linesep + centralize(text) + os.linesep, PaletteStyle.caption)
-
-
-if __name__ == "__main__":
-    a = ConsoleMessenger(access_token="1", api_version=1)
-    a.send_text_message(1, "Test Message", ["132", "123"])
-    a.get_user_info(1)
-    a.send_typing(1, False)
-    a.send_button(1, "Test", [PostbackButton("Test button", "1")])

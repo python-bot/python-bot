@@ -17,5 +17,6 @@ wit
 pytest
 Sphinx
 
-# slack
+# clients
 slackclient
+telebot

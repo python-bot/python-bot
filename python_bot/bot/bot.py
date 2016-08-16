@@ -1,3 +1,4 @@
+import logging.config
 from collections import OrderedDict
 
 import time
@@ -61,8 +62,7 @@ class BotHandlerMixIn:
                 print(user_input)
             if user_input:
                 from python_bot.common.messenger.controllers.console import ConsoleMessenger
-                request = ConsoleMessenger().get_request(1, user_input)
-                self.on_message(request)
+                ConsoleMessenger(on_message_callback=self.on_message, bot=self).on_message(1, user_input)
 
     def on_message(self, request: BotRequest):
         message = self.get_message(request)
@@ -82,6 +82,12 @@ class PythonBot(LocalizationMixIn, MiddlewareHandlerMixIn, BotHandlerMixIn):
             "locale": locale or OrderedDict()
         }
         super().__init__()
+
+    @staticmethod
+    def setup_logging(**kwargs):
+        config = DEFAULT_BOT_SETTINGS["logging"]
+        config.update(kwargs)
+        logging.config.dictConfig(config)
 
     @lazy
     def settings(self):
