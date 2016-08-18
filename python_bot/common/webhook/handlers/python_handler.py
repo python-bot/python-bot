@@ -13,7 +13,7 @@ from python_bot.common.webhook.handlers.base import BaseWebHookHandler
 from python_bot.settings import WebHookSettings
 
 
-class PythonHandler(BaseWebHookHandler):
+class PurePythonHandler(BaseWebHookHandler):
     def __init__(self, settings: WebHookSettings, handlers):
         self._server_class = self.__get_server_class()
         self.__server_thread = None
@@ -24,7 +24,7 @@ class PythonHandler(BaseWebHookHandler):
         that = self
 
         class WebhookHandler(BaseHTTPRequestHandler):
-            server_version = "WebhookHandler/1.0"
+            server_version = "PythonBotWebhookHandler/1.0"
 
             def __process(self, request_type):
                 try:

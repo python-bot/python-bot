@@ -1,15 +1,19 @@
+from python_bot.common.webhook.request import BotRequest
+
+
 class BotMessage:
-    def __init__(self, request):
+    def __init__(self, request: BotRequest, **kwargs):
         self.request = request
         self.messenger = request.messenger
+        self.kwargs = kwargs
 
     def to_json(self):
         pass
 
 
 class BotButtonMessage(BotMessage):
-    def __init__(self, request, text, buttons=None):
-        super().__init__(request)
+    def __init__(self, request: BotRequest, text, buttons=None, **kwargs):
+        super().__init__(request, **kwargs)
         if not buttons:
             buttons = []
         self.buttons = buttons
@@ -17,8 +21,8 @@ class BotButtonMessage(BotMessage):
 
 
 class BotTextMessage(BotMessage):
-    def __init__(self, request, text, quick_replies=None):
-        super().__init__(request)
+    def __init__(self, request: BotRequest, text, quick_replies=None, **kwargs):
+        super().__init__(request, **kwargs)
         if not quick_replies:
             quick_replies = []
         self.quick_replies = quick_replies
@@ -26,14 +30,14 @@ class BotTextMessage(BotMessage):
 
 
 class BotImageMessage(BotMessage):
-    def __init__(self, request, url=None, path=None):
-        super().__init__(request)
+    def __init__(self, request: BotRequest, url=None, path=None, **kwargs):
+        super().__init__(request, **kwargs)
         self.url = url
         self.path = path
 
 
 class BotPersistentMenuMessage(BotMessage):
-    def __init__(self, request, call_to_actions=None):
+    def __init__(self, request: BotRequest, call_to_actions=None, **kwargs):
         super().__init__(request)
         if not call_to_actions:
             call_to_actions = []
@@ -41,6 +45,6 @@ class BotPersistentMenuMessage(BotMessage):
 
 
 class BotTypingMessage(BotMessage):
-    def __init__(self, request, on=True):
-        super().__init__(request)
+    def __init__(self, request, on=True, **kwargs):
+        super().__init__(request, **kwargs)
         self.on = on

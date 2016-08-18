@@ -1,11 +1,10 @@
-import abc
 import json
 import os
 
 import requests
 from requests_toolbelt import MultipartEncoder
+from gettext import gettext as _
 
-from python_bot.common.localization.base import t
 from python_bot.common.messenger.controllers.base.messenger import UserInfo, BaseMessenger
 from python_bot.common.webhook.message import BotButtonMessage, BotTextMessage, BotImageMessage, \
     BotTypingMessage, BotPersistentMenuMessage
@@ -72,7 +71,7 @@ class FacebookMessenger(BaseMessenger):
         """
         if message.path:
             if not os.path.exists(message.path):
-                raise ValueError(t("Image on path [%s] does not exists") % message.path)
+                raise ValueError(_("Image on path [%s] does not exists") % message.path)
 
             payload = {
                 'recipient': json.dumps(
@@ -112,7 +111,7 @@ class FacebookMessenger(BaseMessenger):
 
             self._send_payload(payload)
         else:
-            ValueError(t("Image url either image path should be set"))
+            ValueError(_("Image url either image path should be set"))
 
     def set_persistent_menu(self, message: BotPersistentMenuMessage):
         data = {
