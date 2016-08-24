@@ -10,12 +10,12 @@ from python_bot.common.webfactory.base import BaseAdapter
 
 class DjangoFacebookAdapter(BaseAdapter):
 
-    def unbind(self):
-        # create urls and bind to django
+    def stop(self):
+        # create urls and start to django
         pass
 
-    def bind(self):
-        # create urls and bind to django
+    def start(self):
+        # create urls and start to django
         pass
 
     def create_view(self):

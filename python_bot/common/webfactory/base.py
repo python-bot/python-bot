@@ -12,9 +12,9 @@ class BaseAdapter(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def bind(self):
+    def start(self):
         pass
 
     @abc.abstractmethod
-    def unbind(self):
+    def stop(self):
         pass

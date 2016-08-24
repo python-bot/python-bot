@@ -13,10 +13,10 @@ from python_bot.common.webhook.message import BotButtonMessage, BotTextMessage, 
 
 
 class ConsoleMessenger(BaseMessenger):
-    def unbind(self):
+    def stop(self):
         pass
 
-    def bind(self, **kwargs):
+    def start(self, **kwargs):
         pass
 
     def on_message(self, user_id, text):

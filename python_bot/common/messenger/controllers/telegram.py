@@ -15,14 +15,13 @@ from python_bot.common.webhook.message import BotButtonMessage, BotTextMessage, 
 
 
 class FacebookMessenger(BaseMessenger):
-    def unbind(self):
+    def stop(self):
         pass
 
-    def bind(self, **kwargs):
+    def start(self, **kwargs):
         pass
 
     def __init__(self, access_token=None, api_version=None, on_message_callback=None):
-
         super().__init__(access_token, api_version, on_message_callback)
         self.messenger = telebot.TeleBot(access_token)
 

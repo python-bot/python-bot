@@ -42,13 +42,13 @@ class BotHandlerMixIn:
                 result.append(mod)
         return result
 
-    def bind(self):
+    def start(self):
         for messenger in self.messengers:
-            messenger.bind()
+            messenger.start()
 
-    def unbind(self):
+    def stop(self):
         for messenger in self.messengers:
-            messenger.unbind()
+            messenger.stop()
 
     def wait(self):
         while True:
@@ -131,11 +131,11 @@ class PythonBot(LocalizationMixIn, MiddlewareHandlerMixIn, BotHandlerMixIn):
             return load_module({"entry": first_item[0], "params": first_item[1]})
 
     def __enter__(self):
-        self.bind()
+        self.start()
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        self.unbind()
+        self.stop()
 
 
 if __name__ == "__main__":

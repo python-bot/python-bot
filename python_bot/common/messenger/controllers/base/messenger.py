@@ -34,20 +34,20 @@ class BaseMessenger(metaclass=abc.ABCMeta):
         self.bot = bot
 
     @abc.abstractmethod
+    def start(self, **kwargs):
+        pass
+
+    @abc.abstractmethod
+    def stop(self):
+        pass
+
+    @abc.abstractmethod
     def send_text_message(self, message: BotTextMessage):
         pass
 
     # @abc.abstractmethod
     # def send_generic_message(self, message: BotGenericMessage):
     #     pass
-
-    @abc.abstractmethod
-    def bind(self, **kwargs):
-        pass
-
-    @abc.abstractmethod
-    def unbind(self):
-        pass
 
     @abc.abstractmethod
     def send_button(self, message: BotButtonMessage):

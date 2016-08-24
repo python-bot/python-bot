@@ -24,7 +24,7 @@ class SlackMessenger(BaseMessenger):
     def get_request(self, user_id, text, **kwargs):
         return BotRequest(messenger=self, user_id=user_id, text=text, **kwargs)
 
-    def bind(self, **kwargs):
+    def start(self, **kwargs):
         if self.raw_client.rtm_connect():
             while True:
                 info_from_server = self.raw_client.rtm_read()
@@ -35,7 +35,7 @@ class SlackMessenger(BaseMessenger):
                                         channel=block['channel'])
                 time.sleep(1)
 
-    def unbind(self):
+    def stop(self):
         pass
 
     def on_message(self, user_id, text, **kwargs):
@@ -81,7 +81,7 @@ if __name__ == "__main__":
     channel = "C1YSUDDBQ"
     user_id = "python-bot"
     a = SlackMessenger(access_token="xoxb-66919509936-ks52a9VQDoFp9KzxYZHTIHYQ", api_version=1)
-    a.bind()
+    a.start()
 
 # ++++++++++++++++for the futer +++++++++++++++++++++++
 #print(self.raw_client.api_call("api.test"))
