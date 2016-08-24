@@ -5,20 +5,18 @@ import requests
 from requests_toolbelt import MultipartEncoder
 from gettext import gettext as _
 
-from python_bot.common.messenger.controllers.base.messenger import UserInfo, BaseMessenger
+from python_bot.common.messenger.controllers.base.messenger import UserInfo, BaseMessenger, WebHookMessenger
+from python_bot.common.webhook.handlers.base import WebHookRequestHandler
 from python_bot.common.webhook.message import BotButtonMessage, BotTextMessage, BotImageMessage, \
     BotTypingMessage, BotPersistentMenuMessage
 
 
-class FacebookMessenger(BaseMessenger):
-    def stop(self):
-        pass
-
-    def start(self, **kwargs):
-        pass
+class FacebookMessenger(WebHookMessenger):
+    @property
+    def get_handlers(self):
+        return [WebHookRequestHandler(self.__process)]
 
     def __init__(self, access_token=None, api_version=None, on_message_callback=None):
-
         super().__init__(access_token, api_version, on_message_callback)
         self.base_url = (
             "https://graph.facebook.com"
@@ -171,3 +169,11 @@ class FacebookMessenger(BaseMessenger):
     def _send_payload(self, payload):
         result = requests.post(self.base_url, json=payload).json()
         return result
+
+    def __process(self, data=None):
+        for entry in data['entry']:
+            for message in entry['messaging']:
+                if 'message' in message and 'text' in message['message']:
+                    # Assuming the sender only sends text. Non-text messages like stickers, audio, pictures
+                    # are sent as attachments and must be handled accordingly.
+                    self.on_message(message['sender']['id'], message['message']['text'])

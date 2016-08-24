@@ -3,6 +3,9 @@ import json
 import os
 
 from gettext import gettext as _
+
+from python_bot.common.utils.misc import lazy
+from python_bot.common.webhook.handlers.base import BaseWebHookHandler
 from python_bot.common.webhook.request import BotRequest
 from python_bot.common.webhook.message import BotButtonMessage, BotTextMessage, BotImageMessage, \
     BotTypingMessage, BotPersistentMenuMessage, BotMessage
@@ -32,14 +35,6 @@ class BaseMessenger(metaclass=abc.ABCMeta):
         self.access_token = access_token
         self._on_message_callback = on_message_callback
         self.bot = bot
-
-    @abc.abstractmethod
-    def start(self, **kwargs):
-        pass
-
-    @abc.abstractmethod
-    def stop(self):
-        pass
 
     @abc.abstractmethod
     def send_text_message(self, message: BotTextMessage):
@@ -91,3 +86,44 @@ class BaseMessenger(metaclass=abc.ABCMeta):
                 self.send_typing(message)
             else:
                 raise ValueError("Message handler not found for message: [%s]" % message)
+
+
+class PollingMessenger(BaseMessenger, metaclass=abc.ABCMeta):
+    @property
+    def polling_interval(self):
+        """
+        :return number: Amount of seconds to wait until next polling. Should be positive float number or zero
+        """
+        return 1
+
+    @abc.abstractmethod
+    def receive_updates(self):
+        """
+        With method called every polling interval at separate thread. So this should be blocking check
+        of new update from socket of something like.
+        :return:
+        """
+        pass
+
+
+class WebHookMessenger(BaseMessenger, metaclass=abc.ABCMeta):
+    @property
+    @abc.abstractmethod
+    def get_handlers(self):
+        """
+        Get  list of all bounded handlers
+        :return List:Should return list of WebHookRequestHandler
+        """
+        pass
+
+    def __init__(self, access_token=None, api_version=None, on_message_callback=None, bot=None):
+        super().__init__(access_token, api_version, on_message_callback, bot)
+        self._default_handler = None
+
+    @property
+    def default_handler(self) -> BaseWebHookHandler:
+        return self._default_handler
+
+    def bind_default_handler(self):
+        self._default_handler = self.bot.create_web_hook_handler(self.get_handlers)
+        self._default_handler.start()

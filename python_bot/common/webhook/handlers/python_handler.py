@@ -14,11 +14,11 @@ from python_bot.settings import WebHookSettings
 
 
 class PurePythonHandler(BaseWebHookHandler):
-    def __init__(self, settings: WebHookSettings, handlers):
+    def __init__(self, settings: WebHookSettings, handlers, base_path):
         self._server_class = self.__get_server_class()
         self.__server_thread = None
         self.__server = None
-        super().__init__(settings, handlers)
+        super().__init__(settings, handlers, base_path)
 
     def __get_server_class(self):
         that = self
@@ -62,11 +62,11 @@ class PurePythonHandler(BaseWebHookHandler):
     def __start_server(self):
         self.__server = HTTPServer((self.settings.listen, self.settings.port),
                                    self._server_class)
-
-        self.__server.socket = ssl.wrap_socket(self.__server.socket,
-                                               certfile=self.settings.ssl_cert,
-                                               keyfile=self.settings.ssl_private,
-                                               server_side=True)
+        if self.settings.ssl_cert and self.settings.ssl_private:
+            self.__server.socket = ssl.wrap_socket(self.__server.socket,
+                                                   certfile=self.settings.ssl_cert,
+                                                   keyfile=self.settings.ssl_private,
+                                                   server_side=True)
 
         self.__server.serve_forever()
 

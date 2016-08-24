@@ -25,8 +25,9 @@ class BaseWebHookHandler(metaclass=abc.ABCMeta):
     :param handlers: List of WebHookRequestHandler
     """
 
-    def __init__(self, settings: WebHookSettings, handlers):
+    def __init__(self, settings: WebHookSettings, handlers, base_path=None):
         self.settings = settings
+        self.base_path = base_path
         if not handlers:
             raise ValueError("Handlers can not be empty")
 

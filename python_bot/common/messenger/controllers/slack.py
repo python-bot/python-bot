@@ -1,21 +1,29 @@
 import getpass
 import locale
 import os
-import pprint
-import time
 from time import strftime, gmtime
+
 from slackclient import SlackClient
-from python_bot.common.webhook.request import BotRequest
+
 from python_bot.common.localization.base import t
-from python_bot.common.messenger.controllers.base.messenger import BaseMessenger, UserInfo
-from python_bot.common.messenger.elements.buttons import PostbackButton
+from python_bot.common.messenger.controllers.base.messenger import UserInfo, PollingMessenger
 from python_bot.common.utils.colorize import print_palette, PaletteStyle, centralize
 from python_bot.common.utils.misc import lazy
 from python_bot.common.webhook.message import BotButtonMessage, BotTextMessage, BotImageMessage, \
     BotPersistentMenuMessage, BotTypingMessage
+from python_bot.common.webhook.request import BotRequest
 
 
-class SlackMessenger(BaseMessenger):
+class SlackMessenger(PollingMessenger):
+
+    def receive_updates(self):
+        while True:
+            info_from_server = self.raw_client.rtm_read()
+            for block in info_from_server:
+                if block['type'] == 'message':
+                    self.on_message(user_id=block['user'],
+                                    text=block['text'],
+                                    channel=block['channel'])
 
     @lazy
     def raw_client(self):
@@ -24,19 +32,9 @@ class SlackMessenger(BaseMessenger):
     def get_request(self, user_id, text, **kwargs):
         return BotRequest(messenger=self, user_id=user_id, text=text, **kwargs)
 
-    def start(self, **kwargs):
-        if self.raw_client.rtm_connect():
-            while True:
-                info_from_server = self.raw_client.rtm_read()
-                for block in info_from_server:
-                    if block['type'] == 'message':
-                        self.on_message(user_id=block['user'],
-                                        text=block['text'],
-                                        channel=block['channel'])
-                time.sleep(1)
-
-    def stop(self):
-        pass
+    def __init__(self, access_token=None, api_version=None, on_message_callback=None, bot=None):
+        super().__init__(access_token, api_version, on_message_callback, bot)
+        self.raw_client.rtm_connect()
 
     def on_message(self, user_id, text, **kwargs):
         request = self.get_request(user_id, text, **kwargs)
@@ -82,26 +80,3 @@ if __name__ == "__main__":
     user_id = "python-bot"
     a = SlackMessenger(access_token="xoxb-66919509936-ks52a9VQDoFp9KzxYZHTIHYQ", api_version=1)
     a.start()
-
-# ++++++++++++++++for the futer +++++++++++++++++++++++
-#print(self.raw_client.api_call("api.test"))
-#list_users = self.raw_client.api_call("users.list")['members']
-#user_number = ""
-#user_channel = ""
-#for dict_user in list_users:
-#    for key, value in dict_user.items():
-#        if dict_user[key] == user_id:
-#            user_number = dict_user['id']
-#
-#xxx = self.raw_client.api_call("im.open", user=user_number)
-#
-#pprint.pprint(xxx)
-#user_channel = xxx['channel']
-#user_channel_id = user_channel['id']
-#print(self.raw_client.api_call("chat.postMessage",
-#                               channel=user_channel_id,
-#                               text="Privet Sergey",
-#                               username='smert',
-#                               icon_emoji=':robot_face:'))
-#pprint.pprint(xxx)
-#return xxx

@@ -6,13 +6,15 @@ import time
 import sys
 
 from python_bot.common.localization.handler import LocalizationMixIn
+from python_bot.common.messenger.controllers.base.messenger import WebHookMessenger, PollingMessenger
 from python_bot.common.middleware.handler import MiddlewareHandlerMixIn
 from python_bot.common.storage.base import StorageAdapter
 from python_bot.common.tokenizer.base import BaseTokenizer
 from python_bot.common.utils.misc import lazy
 from python_bot.common.utils.path import load_module
+from python_bot.common.utils.polling import start_polling, stop_polling
 from python_bot.common.webhook.request import BotRequest
-from python_bot.settings import DEFAULT_BOT_SETTINGS
+from python_bot.settings import DEFAULT_BOT_SETTINGS, WebHookSettings
 
 
 class BotHandlerMixIn:
@@ -22,33 +24,33 @@ class BotHandlerMixIn:
     def messengers(self):
         result = []
         for entry in self.settings["messenger"]:
-            if isinstance(entry, (list, tuple)):
-                params = entry[1]
-                entry = entry[0]
-            else:
-                params = {}
+            params = {"on_message_callback": self.on_message, "bot": self}
 
-            if "on_message_callback" in params:
-                params["on_message_callback"] = self.on_message
-            params["bot"] = self
-
-            mod = None
-            if isinstance(entry, str):
-                mod = load_module({"entry": entry, "params": params})
-            elif callable(entry):
-                mod = entry(**params)
-
+            mod = PythonBot.load_module(entry, params)
             if mod:
                 result.append(mod)
         return result
 
-    def start(self):
+    def _validate_messengers(self):
         for messenger in self.messengers:
-            messenger.start()
+            pass
+
+    def start(self):
+        web_hooks = filter(lambda x: isinstance(x, WebHookMessenger), self.messengers)
+        for messenger in web_hooks:
+            messenger.bind_default_handler()
+
+        polling = filter(lambda x: isinstance(x, PollingMessenger), self.messengers)
+
+        polling_methods = [messenger.receive_updates for messenger in polling]
+        if polling_methods:
+            start_polling(polling_methods, True, 1)
 
     def stop(self):
-        for messenger in self.messengers:
-            messenger.stop()
+        web_hooks = filter(lambda x: isinstance(x, WebHookMessenger), self.messengers)
+        for messenger in web_hooks:
+            messenger.default_handler.stop()
+        stop_polling()
 
     def wait(self):
         while True:
@@ -86,15 +88,18 @@ bot_logger.setLevel(logging.ERROR)
 class PythonBot(LocalizationMixIn, MiddlewareHandlerMixIn, BotHandlerMixIn):
     def __init__(self,
                  messenger=None, storage=None, user_storage=None,
-                 middleware=None, tokenizer=None, locale=None):
+                 middleware=None, tokenizer=None, locale=None, web_hook=None):
         self._user_settings = {
             "messenger": messenger or OrderedDict(),
             "storage": storage or OrderedDict(),
             "user_storage": user_storage or OrderedDict(),
             "middleware": middleware or OrderedDict(),
             "tokenizer": tokenizer or OrderedDict(),
-            "locale": locale or OrderedDict()
+            "locale": locale or OrderedDict(),
+            "web_hook": web_hook
         }
+
+        self._validate_messengers()
         super().__init__()
 
     def on_exception(self, exc, request: BotRequest):
@@ -118,6 +123,25 @@ class PythonBot(LocalizationMixIn, MiddlewareHandlerMixIn, BotHandlerMixIn):
                 _settings[k] = self._user_settings.get(k, None)
         return _settings
 
+    @staticmethod
+    def load_module(entry, extra_params=None):
+        if isinstance(entry, (list, tuple)):
+            params = entry[1]
+            entry = entry[0]
+        else:
+            params = {}
+
+        if extra_params:
+            params.update(extra_params)
+
+        mod = None
+        if isinstance(entry, str):
+            mod = load_module({"entry": entry, "params": params})
+        elif callable(entry):
+            mod = entry(**params)
+
+        return mod
+
     @lazy
     def storage(self) -> StorageAdapter:
         if self.settings["storage"]:
@@ -129,6 +153,12 @@ class PythonBot(LocalizationMixIn, MiddlewareHandlerMixIn, BotHandlerMixIn):
         if self.settings["tokenizer"]:
             first_item = next(iter(self.settings["tokenizer"].items()))
             return load_module({"entry": first_item[0], "params": first_item[1]})
+
+    def create_web_hook_handler(self, handlers) -> StorageAdapter:
+        if self.settings["web_hook"]:
+            # todo move to global settings
+            params = {"handlers": handlers, "base_path": "/"}
+            return PythonBot.load_module(self.settings["web_hook"], extra_params=params)
 
     def __enter__(self):
         self.start()

@@ -10,8 +10,6 @@ import sys
 import six
 import time
 
-from python_bot.bot.bot import bot_logger
-
 __stop_polling = threading.Event()
 
 
@@ -20,6 +18,7 @@ def stop_polling():
 
 
 def start_polling(retrieve_updates, none_stop=False, interval=1):
+    from python_bot.bot.bot import bot_logger
     bot_logger.info('Started polling.')
     __stop_polling.clear()
     error_interval = .25
@@ -109,6 +108,7 @@ class WorkerThread(threading.Thread):
         self.start()
 
     def run(self):
+        from python_bot.bot.bot import bot_logger
         while self._running:
             try:
                 task, args, kwargs = self.queue.get(block=True, timeout=.5)

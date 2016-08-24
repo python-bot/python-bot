@@ -8,21 +8,20 @@ from gettext import gettext as _
 
 from telebot import types
 
-from python_bot.common.messenger.controllers.base.messenger import UserInfo, BaseMessenger
+from python_bot.common.messenger.controllers.base.messenger import UserInfo, BaseMessenger, WebHookMessenger
 from python_bot.common.messenger.elements.buttons import Button
+from python_bot.common.webhook.handlers.base import WebHookRequestHandler
 from python_bot.common.webhook.message import BotButtonMessage, BotTextMessage, BotImageMessage, \
     BotTypingMessage, BotPersistentMenuMessage
 
 
-class FacebookMessenger(BaseMessenger):
-    def stop(self):
-        pass
+class TelegramMessenger(WebHookMessenger):
+    @property
+    def get_handlers(self):
+        return [WebHookRequestHandler(self.__process)]
 
-    def start(self, **kwargs):
-        pass
-
-    def __init__(self, access_token=None, api_version=None, on_message_callback=None):
-        super().__init__(access_token, api_version, on_message_callback)
+    def __init__(self, access_token=None, api_version=None, on_message_callback=None, bot=None):
+        super().__init__(access_token, api_version, on_message_callback, bot)
         self.messenger = telebot.TeleBot(access_token)
 
     def send_text_message(self, message: BotTextMessage):
@@ -63,3 +62,6 @@ class FacebookMessenger(BaseMessenger):
         # user.timezone = user_details.get("timezone")
         # user.profile_pic = "https://graph.facebook.com/%s/picture" % user_id
         # return user
+
+    def __process(self, data=None):
+        self.on_message(data["user_id"], data["text"])
