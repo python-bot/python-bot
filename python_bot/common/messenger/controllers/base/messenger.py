@@ -1,5 +1,5 @@
 import abc
-import json
+import urllib.parse
 import os
 
 from gettext import gettext as _
@@ -110,20 +110,30 @@ class WebHookMessenger(BaseMessenger, metaclass=abc.ABCMeta):
     @property
     @abc.abstractmethod
     def get_handlers(self):
-        """
-        Get  list of all bounded handlers
-        :return List:Should return list of WebHookRequestHandler
-        """
+        """Get list of all bounded handlers
+
+        Returns:
+            List of WebHookRequestHandler"""
+        pass
+
+    @abc.abstractmethod
+    def set_web_hook_url(self, web_hook_url):
         pass
 
     def __init__(self, access_token=None, api_version=None, on_message_callback=None, bot=None):
         super().__init__(access_token, api_version, on_message_callback, bot)
         self._default_handler = None
+        self._base_path = None
+        self._base_url = None
 
     @property
     def default_handler(self) -> BaseWebHookHandler:
         return self._default_handler
 
     def bind_default_handler(self):
-        self._default_handler = self.bot.create_web_hook_handler(self.get_handlers)
+        from python_bot.bot.bot import bot_logger
+        self._default_handler, self._base_path = self.bot.bind_web_hook_handler(self.get_handlers)
+        self._base_url = urllib.parse.urljoin(self._default_handler.settings.url_base, self._base_path)
+        bot_logger.debug("Web hook for %s bounded to %s" % (self.__class__.__name__, self._base_url))
         self._default_handler.start()
+        self.set_web_hook_url(self._base_url)

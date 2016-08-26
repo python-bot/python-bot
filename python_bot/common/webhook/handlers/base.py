@@ -25,16 +25,21 @@ class BaseWebHookHandler(metaclass=abc.ABCMeta):
     :param handlers: List of WebHookRequestHandler
     """
 
-    def __init__(self, settings: WebHookSettings, handlers, base_path=None):
+    def __init__(self, settings: WebHookSettings):
         self.settings = settings
-        self.base_path = base_path
+        self.handlers = {}
+
+    def set_handlers(self, handlers: list, base_path: str):
+        self.handlers[base_path] = handlers
+
+    def get_request_handler(self, request_type, path, headers) -> WebHookRequestHandler:
+        base_path = path.split("/")[0]
+        handlers = self.handlers.get(base_path)
+
         if not handlers:
             raise ValueError("Handlers can not be empty")
 
-        self.handlers = handlers
-
-    def get_request_handler(self, request_type, path, headers) -> WebHookRequestHandler:
-        for handler in self.handlers:
+        for handler in handlers:
             if handler.can_process(request_type, path, headers):
                 return handler
 

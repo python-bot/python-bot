@@ -1,21 +1,17 @@
-import json
-import os
-
 import requests
-from requests_toolbelt import MultipartEncoder
 import telebot
-from gettext import gettext as _
-
 from telebot import types
 
-from python_bot.common.messenger.controllers.base.messenger import UserInfo, BaseMessenger, WebHookMessenger
-from python_bot.common.messenger.elements.buttons import Button
+from python_bot.common.messenger.controllers.base.messenger import UserInfo, WebHookMessenger
 from python_bot.common.webhook.handlers.base import WebHookRequestHandler
 from python_bot.common.webhook.message import BotButtonMessage, BotTextMessage, BotImageMessage, \
     BotTypingMessage, BotPersistentMenuMessage
 
 
 class TelegramMessenger(WebHookMessenger):
+    def set_web_hook_url(self, web_hook_url):
+        self.messenger.set_webhook(web_hook_url, self.default_handler.settings.ssl_cert)
+
     @property
     def get_handlers(self):
         return [WebHookRequestHandler(self.__process)]

@@ -14,11 +14,11 @@ from python_bot.settings import WebHookSettings
 
 
 class PurePythonHandler(BaseWebHookHandler):
-    def __init__(self, settings: WebHookSettings, handlers, base_path):
+    def __init__(self, settings: WebHookSettings):
         self._server_class = self.__get_server_class()
         self.__server_thread = None
         self.__server = None
-        super().__init__(settings, handlers, base_path)
+        super().__init__(settings)
 
     def __get_server_class(self):
         that = self

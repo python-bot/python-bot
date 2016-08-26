@@ -12,6 +12,13 @@ from python_bot.common.webhook.message import BotButtonMessage, BotTextMessage, 
 
 
 class FacebookMessenger(WebHookMessenger):
+    def set_web_hook_url(self, web_hook_url):
+        from python_bot.bot.bot import bot_logger
+        bot_logger.info("Edit your Webhook url." +
+                        web_hook_url + os.linesep +
+                        "Follow reference from "
+                        "https://developers.facebook.com/docs/messenger-platform/webhook-reference")
+
     @property
     def get_handlers(self):
         return [WebHookRequestHandler(self.__process)]
