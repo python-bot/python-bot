@@ -45,3 +45,5 @@ Nice to have
 
 ##### Localization support for Russian
 
+##### Stats https://github.com/botanio/sdk#py
+
