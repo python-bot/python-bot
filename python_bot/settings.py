@@ -37,12 +37,8 @@ class WebHookSettings:
 
 DEFAULT_BOT_SETTINGS = {
     "messengers": [],
-    "storage": {
-        "python_bot.common.storage.json_database.JsonDatabaseAdapter": {}
-    },
-    "user_storage": {
-        "python_bot.common.storage.json_database.UserJsonDatabaseAdapter": {}
-    },
+    "storage": None,
+    "user_storage": None,
     "middleware": [
         ("python_bot.common.middleware.emoji.EmojiMiddleware", {
             "use_aliases": True,

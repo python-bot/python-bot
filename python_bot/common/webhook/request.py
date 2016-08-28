@@ -17,11 +17,10 @@ class BotRequest:
 
     @lazy
     def user_storage(self) -> UserStorageAdapter:
-        params = self.messenger.bot.settings["user_storage"].get("params", {})
-        params["user_id"] = self.user_id
         if self.messenger.bot.settings["user_storage"]:
-            first_item = next(iter(self.messenger.bot.settings["user_storage"].items()))
-            return load_module({"entry": first_item[0], "params": first_item[1]})
+            params = {"user_id": self.user_id, "database_name": self.messenger.__class__.__name__}
+            from python_bot.bot import PythonBot
+            return PythonBot.load_module(self.messenger.bot.settings["user_storage"], params)
 
     def is_positive(self):
         return any(filter(lambda x: x in self.text.lower().split(),

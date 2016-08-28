@@ -113,10 +113,10 @@ class PythonBot(LocalizationMixIn, MiddlewareHandlerMixIn, BotHandlerMixIn):
                  messengers=None, storage=None, user_storage=None,
                  middleware=None, tokenizer=None, locale=None, web_hook=None):
         self._user_settings = {
-            "messengers": messengers or OrderedDict(),
-            "storage": storage or OrderedDict(),
-            "user_storage": user_storage or OrderedDict(),
-            "middleware": middleware or OrderedDict(),
+            "messengers": messengers or (),
+            "storage": storage,
+            "user_storage": user_storage,
+            "middleware": middleware or (),
             "tokenizer": tokenizer or OrderedDict(),
             "locale": locale or OrderedDict(),
             "web_hook": web_hook

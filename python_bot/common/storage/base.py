@@ -1,5 +1,6 @@
 import abc
 
+
 class Adapter(metaclass=abc.ABCMeta):
     """
     An abstract superclass for all adapters
@@ -39,7 +40,7 @@ class StorageAdapter(Adapter):
         pass
 
     @abc.abstractmethod
-    def get(self, statement_text):
+    def get(self, statement_text, default=None):
         """
         Returns a object from the database if it exists
         """
@@ -96,20 +97,30 @@ class StorageAdapter(Adapter):
 
 
 class UserStorageAdapter(StorageAdapter):
+    PROPERTY_SEPARATOR = "__"
+
     def drop(self):
         super().drop()
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.user_id = self.kwargs.get("user_id", "")
+        if "user_id" not in self.kwargs:
+            raise ValueError("You need to specify user id")
+
+        if "database_name" not in self.kwargs:
+            raise ValueError("You need to specify database name")
+
+        self.user_id = str(self.kwargs["user_id"])
+        self.database_name = self.kwargs["database_name"]
+
         if not self.user_id:
             raise ValueError("user_id is not set")
 
     def _format_key(self, key):
-        return self.user_id + "__" + key
+        return self.PROPERTY_SEPARATOR.join((self.database_name, self.user_id, key))
 
     def _default_filter_func(self, key):
-        return key.startswith(self.user_id + "__")
+        return key.startswith(self.PROPERTY_SEPARATOR.join((self.database_name, self.user_id)))
 
     def update(self, key, value):
         return super().update(self._format_key(key), value)
@@ -130,5 +141,5 @@ class UserStorageAdapter(StorageAdapter):
     def get_random(self, key):
         return super().get_random(self._format_key(key))
 
-    def get(self, key):
-        return super().get(self._format_key(key))
+    def get(self, key, default=None):
+        return super().get(self._format_key(key), default=default)

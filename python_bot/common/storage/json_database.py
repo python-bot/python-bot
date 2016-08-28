@@ -1,5 +1,5 @@
 from jsondb import Database
-
+from gettext import gettext as _
 from python_bot.common.storage.base import StorageAdapter, UserStorageAdapter
 
 
@@ -12,7 +12,9 @@ class JsonDatabaseAdapter(StorageAdapter):
     def __init__(self, **kwargs):
         super(JsonDatabaseAdapter, self).__init__(**kwargs)
 
-        database_path = self.kwargs.get("database", "database.db")
+        if "database_path" not in self.kwargs:
+            raise ValueError(_("You need to specify database path"))
+        database_path = self.kwargs.get("database_path")
         self.database = Database(database_path)
 
     def _keys(self, filter_func=None):
@@ -22,11 +24,11 @@ class JsonDatabaseAdapter(StorageAdapter):
     def count(self, filter_func=None):
         return len(self._keys(filter_func))
 
-    def get(self, statement_text):
+    def get(self, statement_text, default=None):
         values = self.database.data(key=statement_text)
 
         if not values:
-            return None
+            return default
 
         return values
 

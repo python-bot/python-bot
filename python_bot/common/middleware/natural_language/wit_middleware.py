@@ -16,7 +16,7 @@ class WitMiddleware(MiddlewareMixin):
 
     def process_request(self, request: BotRequest):
         if request.text:
-            user_data = request.user_storage().get(request.user_id)
+            user_data = request.user_storage.get(request.user_id)
             wit_data = user_data.get(self.WIT_DATA_KEY, {})
             context = wit_data.get(self.WIT_CONTEXT_KEY, {})
 
