@@ -1,7 +1,10 @@
+import json
+
 import requests
 import telebot
+from requests.utils import guess_json_utf
 from telebot import types
-
+from gettext import gettext as _
 from python_bot.common.messenger.controllers.base.messenger import UserInfo, WebHookMessenger
 from python_bot.common.webhook.handlers.base import WebHookRequestHandler
 from python_bot.common.webhook.message import BotButtonMessage, BotTextMessage, BotImageMessage, \
@@ -16,8 +19,11 @@ class TelegramMessenger(WebHookMessenger):
     def get_handlers(self):
         return [WebHookRequestHandler(self.__process)]
 
-    def __init__(self, access_token=None, api_version=None, on_message_callback=None, bot=None):
-        super().__init__(access_token, api_version, on_message_callback, bot)
+    def __init__(self, access_token=None, api_version=None, on_message_callback=None, bot=None, base_path=None):
+        if not access_token:
+            raise ValueError(_("You need to specify access_token."))
+
+        super().__init__(access_token, api_version, on_message_callback, bot, base_path)
         self.messenger = telebot.TeleBot(access_token)
 
     def send_text_message(self, message: BotTextMessage):
@@ -60,4 +66,12 @@ class TelegramMessenger(WebHookMessenger):
         # return user
 
     def __process(self, data=None):
-        self.on_message(data["user_id"], data["text"])
+        if not data:
+            return
+
+        data = json.loads(data.decode(), encoding=guess_json_utf(data))
+        message = data["message"]
+
+        from python_bot.bot.bot import bot_logger
+        bot_logger.debug("Received message: %s" % message)
+        self.on_message(message["chat"]["id"], message["text"])

@@ -120,11 +120,17 @@ class WebHookMessenger(BaseMessenger, metaclass=abc.ABCMeta):
     def set_web_hook_url(self, web_hook_url):
         pass
 
-    def __init__(self, access_token=None, api_version=None, on_message_callback=None, bot=None):
+    def __init__(self, access_token=None, api_version=None, on_message_callback=None, bot=None, base_path=None):
         super().__init__(access_token, api_version, on_message_callback, bot)
         self._default_handler = None
-        self._base_path = None
-        self._base_url = None
+        self.base_path = base_path
+
+    @property
+    def base_url(self):
+        if not self._default_handler:
+            return None
+
+        return urllib.parse.urljoin(self._default_handler.settings.url_base, self.base_path)
 
     @property
     def default_handler(self) -> BaseWebHookHandler:
@@ -132,8 +138,7 @@ class WebHookMessenger(BaseMessenger, metaclass=abc.ABCMeta):
 
     def bind_default_handler(self):
         from python_bot.bot.bot import bot_logger
-        self._default_handler, self._base_path = self.bot.bind_web_hook_handler(self.get_handlers)
-        self._base_url = urllib.parse.urljoin(self._default_handler.settings.url_base, self._base_path)
-        bot_logger.debug("Web hook for %s bounded to %s" % (self.__class__.__name__, self._base_url))
+        self._default_handler, self.base_path = self.bot.bind_web_hook_handler(self.get_handlers, self.base_path)
+        bot_logger.debug("Web hook for %s bounded to %s" % (self.__class__.__name__, self.base_url))
         self._default_handler.start()
-        self.set_web_hook_url(self._base_url)
+        self.set_web_hook_url(self.base_url)

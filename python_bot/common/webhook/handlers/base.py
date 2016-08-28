@@ -6,6 +6,13 @@ from python_bot.settings import WebHookSettings
 class WebHookRequestHandler:
     def __init__(self, process=None, can_process=None, request_type="POST"):
         self._process = process
+
+        if not can_process:
+            def true_function(**kwargs):
+                return True
+
+            can_process = true_function
+
         self._can_process = can_process
         self._request_type = request_type
 
@@ -30,7 +37,8 @@ class BaseWebHookHandler(metaclass=abc.ABCMeta):
         self.handlers = {}
 
     def set_handlers(self, handlers: list, base_path: str):
-        self.handlers[base_path] = handlers
+
+        self.handlers[base_path.split("/")[0]] = handlers
 
     def get_request_handler(self, request_type, path, headers) -> WebHookRequestHandler:
         base_path = path.split("/")[0]

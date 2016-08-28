@@ -8,7 +8,7 @@ LOCALE_DIR = os.path.join(os.path.dirname(__file__), "locale")
 
 class WebHookSettings:
     host = '<ip/host where the bot is running>'
-    port = 8443  # 443, 80, 88 or 8443 (port need to be 'open')
+    port = 8000  # 443, 80, 88 or 8000 (port need to be 'open')
     listen = '0.0.0.0'  # In some VPS you may need to put here the IP addr
     # Quick'n'dirty SSL certificate generation:
     #
@@ -27,7 +27,7 @@ class WebHookSettings:
             schema += "s"
         return "%s://%s:%s" % (schema, self.host, self.port)
 
-    def __init__(self, host, port=8443, listen='0.0.0.0', ssl_cert='', ssl_private=''):
+    def __init__(self, host, port=8000, listen='0.0.0.0', ssl_cert='', ssl_private=''):
         self.host = host
         self.port = port
         self.listen = listen
@@ -36,7 +36,7 @@ class WebHookSettings:
 
 
 DEFAULT_BOT_SETTINGS = {
-    "messenger": [],
+    "messengers": [],
     "storage": {
         "python_bot.common.storage.json_database.JsonDatabaseAdapter": {}
     },

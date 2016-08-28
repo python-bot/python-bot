@@ -1,5 +1,6 @@
 import logging.config
 import time
+import uuid
 from collections import OrderedDict
 
 import sys
@@ -38,7 +39,7 @@ class BotHandlerMixIn:
         Returns:
             List of BaseMessenger objects corresponding to user settings."""
         result = []
-        for entry in self.settings["messenger"]:
+        for entry in self.settings["messengers"]:
             params = {"on_message_callback": self.on_message, "bot": self}
 
             mod = PythonBot.load_module(entry, params)
@@ -109,10 +110,10 @@ class BotHandlerMixIn:
 
 class PythonBot(LocalizationMixIn, MiddlewareHandlerMixIn, BotHandlerMixIn):
     def __init__(self,
-                 messenger=None, storage=None, user_storage=None,
+                 messengers=None, storage=None, user_storage=None,
                  middleware=None, tokenizer=None, locale=None, web_hook=None):
         self._user_settings = {
-            "messenger": messenger or OrderedDict(),
+            "messengers": messengers or OrderedDict(),
             "storage": storage or OrderedDict(),
             "user_storage": user_storage or OrderedDict(),
             "middleware": middleware or OrderedDict(),
@@ -207,10 +208,11 @@ class PythonBot(LocalizationMixIn, MiddlewareHandlerMixIn, BotHandlerMixIn):
 
         return mod
 
-    def bind_web_hook_handler(self, handlers) -> BaseWebHookHandler:
+    def bind_web_hook_handler(self, handlers, base_path=None) -> BaseWebHookHandler:
         if self.settings["web_hook"]:
-            import uuid
-            base_path = str(uuid.uuid4()).replace("-", "")
+            if not base_path:
+                base_path = str(uuid.uuid4()).replace("-", "")
+
             self.web_hook_handler.set_handlers(handlers, base_path)
             return self.web_hook_handler, base_path
 
