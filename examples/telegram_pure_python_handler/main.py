@@ -7,6 +7,11 @@ from python_bot.common.webhook.handlers.python_handler import PurePythonHandler
 from python_bot.settings import WebHookSettings
 from python_bot.tests.common.middleware import EchoMiddleware
 
+# Getting Your Token
+# From your Telegram client - connect to BotFather
+# and basically follow the instructions on the Telegram website:
+# https://core.telegram.org/bots#3-how-do-i-create-a-bot
+
 ACCESS_TOKEN = 'YOUR_ACCESS_TOKEN'
 
 # For development purposes, we will use Ngrok that sets up secure tunnels to our localhost i.e.
