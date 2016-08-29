@@ -5,12 +5,13 @@ from collections import OrderedDict
 
 import sys
 
+import functools
+
 from python_bot.common.localization.handler import LocalizationMixIn
 from python_bot.common.messenger.controllers.base.messenger import WebHookMessenger, PollingMessenger
 from python_bot.common.middleware.handler import MiddlewareHandlerMixIn
 from python_bot.common.storage.base import StorageAdapter
 from python_bot.common.tokenizer.base import BaseTokenizer
-from python_bot.common.utils.misc import lazy
 from python_bot.common.utils.path import load_module
 from python_bot.common.utils.polling import start_polling, stop_polling
 from python_bot.common.webhook.handlers.base import BaseWebHookHandler
@@ -32,7 +33,8 @@ bot_logger.setLevel(logging.ERROR)
 class BotHandlerMixIn:
     request_class = BotRequest
 
-    @lazy
+    @property
+    @functools.lru_cache()
     def messengers(self) -> list:
         """Lazy Property list of messenger
 
@@ -132,7 +134,8 @@ class PythonBot(LocalizationMixIn, MiddlewareHandlerMixIn, BotHandlerMixIn):
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.stop()
 
-    @lazy
+    @property
+    @functools.lru_cache()
     def settings(self):
         """Lazy property User settings
 
@@ -151,7 +154,8 @@ class PythonBot(LocalizationMixIn, MiddlewareHandlerMixIn, BotHandlerMixIn):
                 _settings[k] = self._user_settings.get(k, None)
         return _settings
 
-    @lazy
+    @property
+    @functools.lru_cache()
     def storage(self) -> StorageAdapter:
         """Lazy property for storage adapter
 
@@ -163,7 +167,8 @@ class PythonBot(LocalizationMixIn, MiddlewareHandlerMixIn, BotHandlerMixIn):
             first_item = next(iter(self.settings["storage"].items()))
             return load_module({"entry": first_item[0], "params": first_item[1]})
 
-    @lazy
+    @property
+    @functools.lru_cache()
     def tokenizer(self) -> BaseTokenizer:
         """Lazy property for tokenizer
 
@@ -175,7 +180,8 @@ class PythonBot(LocalizationMixIn, MiddlewareHandlerMixIn, BotHandlerMixIn):
             first_item = next(iter(self.settings["tokenizer"].items()))
             return load_module({"entry": first_item[0], "params": first_item[1]})
 
-    @lazy
+    @property
+    @functools.lru_cache()
     def web_hook_handler(self) -> BaseWebHookHandler:
         if self.settings["web_hook"]:
             return PythonBot.load_module(self.settings["web_hook"])

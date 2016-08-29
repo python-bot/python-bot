@@ -1,7 +1,7 @@
 import os
 from collections import OrderedDict
 
-from python_bot.common.utils.misc import lazy
+import functools
 
 LOCALE_DIR = os.path.join(os.path.dirname(__file__), "locale")
 
@@ -20,7 +20,8 @@ class WebHookSettings:
     ssl_cert = ''  # './webhook_cert.pem'  # Path to the ssl certificate
     ssl_private = ''  # './webhook_pkey.pem'  # Path to the ssl private key
 
-    @lazy
+    @property
+    @functools.lru_cache()
     def url_base(self):
         schema = "http"
         if self.ssl_cert:

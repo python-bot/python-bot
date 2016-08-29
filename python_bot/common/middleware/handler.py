@@ -1,4 +1,5 @@
-from python_bot.common.utils.misc import lazy
+import functools
+
 from python_bot.common.utils.path import load_module
 
 
@@ -7,7 +8,8 @@ class MiddlewareHandlerMixIn(object):
         self._middleware_chain = None
         super().__init__()
 
-    @lazy
+    @property
+    @functools.lru_cache()
     def middleware(self):
         if self._middleware_chain:
             return self._middleware_chain

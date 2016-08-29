@@ -3,12 +3,12 @@ import locale
 import os
 from time import strftime, gmtime
 
+import functools
 from slackclient import SlackClient
 
-from python_bot.common.localization.base import t
+from gettext import gettext as _
 from python_bot.common.messenger.controllers.base.messenger import UserInfo, PollingMessenger
 from python_bot.common.utils.colorize import print_palette, PaletteStyle, centralize
-from python_bot.common.utils.misc import lazy
 from python_bot.common.webhook.message import BotButtonMessage, BotTextMessage, BotImageMessage, \
     BotPersistentMenuMessage, BotTypingMessage
 from python_bot.common.webhook.request import BotRequest
@@ -25,7 +25,8 @@ class SlackMessenger(PollingMessenger):
                                     text=block['text'],
                                     channel=block['channel'])
 
-    @lazy
+    @property
+    @functools.lru_cache()
     def raw_client(self):
         return SlackClient(token=self.access_token)
 
@@ -60,14 +61,14 @@ class SlackMessenger(PollingMessenger):
         result.locale = locale.getlocale()[0]
         result.timezone = strftime("%z", gmtime())
 
-        self._print_caption(t("User info:"))
+        self._print_caption(_("User info:"))
         print_palette(result, PaletteStyle.text)
 
         return result
 
     def send_image(self, message: BotImageMessage):
-        self._print_caption(t("Send image:"))
-        print_palette(t("Recipient: %s, Url: %s, Path: %s") % (message.request.user_id, message.url, message.path),
+        self._print_caption(_("Send image:"))
+        print_palette(_("Recipient: %s, Url: %s, Path: %s") % (message.request.user_id, message.url, message.path),
                       PaletteStyle.text)
 
     @staticmethod

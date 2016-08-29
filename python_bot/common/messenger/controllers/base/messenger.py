@@ -4,7 +4,6 @@ import os
 
 from gettext import gettext as _
 
-from python_bot.common.utils.misc import lazy
 from python_bot.common.webhook.handlers.base import BaseWebHookHandler
 from python_bot.common.webhook.request import BotRequest
 from python_bot.common.webhook.message import BotButtonMessage, BotTextMessage, BotImageMessage, \

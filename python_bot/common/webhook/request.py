@@ -1,11 +1,10 @@
+import functools
 import re
+from gettext import gettext as _
 
 import dateutil.parser
 
-from gettext import gettext as _
 from python_bot.common.storage.base import UserStorageAdapter
-from python_bot.common.utils.misc import lazy
-from python_bot.common.utils.path import load_module
 
 
 class BotRequest:
@@ -15,7 +14,8 @@ class BotRequest:
         self.user_id = user_id
         self.messenger = messenger
 
-    @lazy
+    @property
+    @functools.lru_cache()
     def user_storage(self) -> UserStorageAdapter:
         if self.messenger.bot.settings["user_storage"]:
             params = {"user_id": self.user_id, "database_name": self.messenger.__class__.__name__}
