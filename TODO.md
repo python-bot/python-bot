@@ -3,30 +3,20 @@ TODO list
 
 Before merge features
 -------------
-##### Planned messenger support (text mode only)
+##### Planned messenger support will text only (support for additional user data such as buttons, images, location, channels will be planned on next release, now you can access from BotRequest.extra)
 
-Messenger   | Web polling    | Web hook        | Text mode
+Messenger   | Long polling   | Web hook        | Text mode
 ----------- | :------------: | :------:        | :--------:
 Slack       | Partially done | -               | Not started
-Telegram    | Not started    | Partially done  | Partially done
+Telegram    | Not planned    | Partially done  | Partially done
 Facebook    | -              | Partially done  | Partially done
 
 ##### Webhook handlers
 - Pure python (Partially done)
-- Flask
-- Cherrypy
 
 ##### DB storage
 - Simple json storage (Partially done)
 - MongoDB
-
-##### Localization
-- make all string translatable
-- the same for datetime formats
-
-##### Documentation
-- comment all public methods (Follow style guide https://google.github.io/styleguide/pyguide.html)
-- log debug information
 
 Nice to have
 -----------------
@@ -36,14 +26,24 @@ Nice to have
 ##### DB storage
 - MySQL
 
-##### Webhook handlers
+##### Webhook handlers (by priority)
+- Flask
 - Django
+- Cherrypy
 
-##### Text mode for Skype
+##### Messenger support (by priority)
+- Skype
+- Kik
 
-##### Sphinx documentation
+##### Documentation
+- comment all public methods (Follow style guide https://google.github.io/styleguide/pyguide.html)
+- log debug information
+- Sphinx documentation
 
-##### Localization support for Russian
 
-##### Stats https://github.com/botanio/sdk#py
+##### Stats https://github.com/botanio/sdk#py or something like
 
+##### Localization
+- make all string translatable
+- the same for datetime formats
+- Localization support for Russian
