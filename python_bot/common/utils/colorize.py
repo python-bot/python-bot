@@ -1,3 +1,5 @@
+import os
+
 _color_names = ('black', 'red', 'green', 'yellow', 'blue', 'magenta', 'cyan', 'white')
 _foreground = {_color_names[x]: '3%s' % x for x in range(8)}
 _background = {_color_names[x]: '4%s' % x for x in range(8)}
@@ -47,6 +49,18 @@ def colorize(text='', opts=(), **kwargs):
 
 
 def make_style(opts=(), **kwargs):
+    """
+    Returns a function with default parameters for colorize()
+    Example:
+        bold_red = make_style(opts=('bold',), fg='red')
+        print(bold_red('hello'))
+        KEYWORD = make_style(fg='yellow')
+        COMMENT = make_style(fg='blue', opts=('bold',))
+    """
+    return lambda text: colorize(text, opts, **kwargs)
+
+
+def make_print(opts=(), **kwargs):
     """
     Returns a function with default parameters for colorize()
     Example:
@@ -159,12 +173,26 @@ def print_palette(text, style_name):
     print(colorize(text, **PALETTES[DEFAULT_PALETTE][style_name]))
 
 
-def centralize(s, length=80):
-    if s is None:
-        s = ""
-    sep_length = (length - len(s)) / 2
-    if s:
-        sep_length -= 1
-        s = " " + s + " "
-    result = "=" * int(sep_length) + s + "=" * round(sep_length)
-    return result
+class PrintHelper:
+    def __init__(self):
+        self.warning = lambda text: print_palette(text, PaletteStyle.warning)
+        self.error = lambda text: print_palette(text, PaletteStyle.error)
+        self.success = lambda text: print_palette(text, PaletteStyle.success)
+        self.notice = lambda text: print_palette(text, PaletteStyle.notice)
+        self.quick_reply = lambda text: print_palette(text, PaletteStyle.quick_reply)
+        self.button = lambda text: print_palette(text, PaletteStyle.button)
+        self.text = lambda text: print_palette(text, PaletteStyle.text)
+        self.typing = lambda text: print_palette(text, PaletteStyle.typing)
+        self.caption = lambda text: print_palette(text, PaletteStyle.caption)
+        self.header = lambda text: print_palette(os.linesep + self.centralize(text) + os.linesep, PaletteStyle.caption)
+
+    @staticmethod
+    def centralize(s, length=80):
+        if s is None:
+            s = ""
+        sep_length = (length - len(s)) / 2
+        if s:
+            sep_length -= 1
+            s = " " + s + " "
+        result = "=" * int(sep_length) + s + "=" * round(sep_length)
+        return result

@@ -12,6 +12,10 @@ from python_bot.common.webhook.message import BotButtonMessage, BotTextMessage, 
 
 
 class FacebookMessenger(WebHookMessenger):
+    @property
+    def raw_client(self):
+        raise NotImplementedError("Facebook messenger doesn't implement raw_client")
+
     def set_web_hook_url(self, web_hook_url):
         from python_bot.bot.bot import bot_logger
         bot_logger.info("Edit your Webhook url." +

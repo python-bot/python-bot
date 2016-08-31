@@ -8,10 +8,14 @@ def echo_middleware(get_message):
 
     def middleware(request: BotRequest):
         messages = get_message(request)
-        pre_message = request.user_storage.get("prev_message", "Previous message now found. Say hello")
 
-        messages.append(BotTextMessage(request, pre_message))
-        request.user_storage.update("prev_message", "Previous message was: %s" % request.text)
+        # Get previous saved message for current user. User storage is persistent storage for each user.
+        pre_message = request.user_storage.get("prev_message")
+
+        message = "Previous message was: %s" % pre_message if pre_message else "Say hello"
+        messages.append(BotTextMessage(request, message))
+
+        request.user_storage.update("prev_message", request.text)
 
         return messages
 

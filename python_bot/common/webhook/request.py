@@ -8,15 +8,26 @@ from python_bot.common.storage.base import UserStorageAdapter
 
 
 class BotRequest:
-    def __init__(self, messenger, user_id, text: str, analyzed_text: str = None):
+    def __init__(self, messenger, user_id, text: str, raw_response: str, extra):
         self.text = str(text)
-        self.analyze_text = analyzed_text
+        if isinstance(raw_response, bytes):
+            raw_response = raw_response.decode()
+
+        self.raw_response = raw_response
+        self.extra = extra
         self.user_id = user_id
         self.messenger = messenger
+
+    def __repr__(self):
+        from pprint import pformat
+        return pformat(vars(self), indent=4)
 
     @property
     @functools.lru_cache()
     def user_storage(self) -> UserStorageAdapter:
+        """Cached Property for persistence storage
+        Returns:
+            UserStorageAdapter can be any kind of storage."""
         if self.messenger.bot.settings["user_storage"]:
             params = {"user_id": self.user_id, "database_name": self.messenger.__class__.__name__}
             from python_bot.bot import PythonBot

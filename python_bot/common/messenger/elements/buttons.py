@@ -1,7 +1,7 @@
 import abc
 import json
 
-from gettext import  gettext as _
+from gettext import gettext as _
 
 
 class Button(metaclass=abc.ABCMeta):

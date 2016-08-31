@@ -3,16 +3,19 @@ import logging
 from python_bot.bot import PythonBot
 from python_bot.bot.bot import bot_logger
 from python_bot.common.messenger.controllers.telegram import TelegramMessenger
+from python_bot.common.middleware.base import MiddlewareMixin
+from python_bot.common.utils.colorize import PrintHelper
 from python_bot.common.webhook.handlers.python_handler import PurePythonHandler
+from python_bot.common.webhook.message import BotTextMessage
+from python_bot.common.webhook.request import BotRequest
 from python_bot.settings import WebHookSettings
-from python_bot.tests.common.middleware import EchoMiddleware
 
 # Getting Your Token
 # From your Telegram client - connect to BotFather
 # and basically follow the instructions on the Telegram website:
 # https://core.telegram.org/bots#3-how-do-i-create-a-bot
 
-ACCESS_TOKEN = 'YOUR_ACCESS_TOKEN'
+ACCESS_TOKEN = '{ACCESS_TOKEN}'
 
 # For development purposes, we will use Ngrok that sets up secure tunnels to our localhost i.e.
 # Ngrok gives web accessible URLs and tunnels all traffic from that URL to our localhost!
@@ -24,7 +27,7 @@ ACCESS_TOKEN = 'YOUR_ACCESS_TOKEN'
 NGROK_URL = 'https://{unique_id}.ngrok.io'
 
 
-# Now we need to ovveride web hook url to our NGROK_URL
+# Now we need to override web hook url to our NGROK_URL
 class MyTelegramMessenger(TelegramMessenger):
     def set_web_hook_url(self, web_hook_url):
         super().set_web_hook_url(NGROK_URL)
@@ -32,9 +35,23 @@ class MyTelegramMessenger(TelegramMessenger):
 
 bot_logger.setLevel(logging.DEBUG)
 
+helper = PrintHelper()
+
+
+# We also create middleware which print user request and answer hello
+class CustomMiddleware(MiddlewareMixin):
+    def process_message(self, request: BotRequest, messages):
+        messages.append(BotTextMessage(request, "Hello!"))
+        helper.header("End message")
+        return messages
+
+    def process_request(self, request: BotRequest):
+        helper.header("Start message")
+        print(request)
+
 
 with PythonBot(
-        middleware=[EchoMiddleware],
+        middleware=[CustomMiddleware],
         messengers=[
             (
                     MyTelegramMessenger,

@@ -12,8 +12,12 @@ from python_bot.common.webhook.message import BotButtonMessage, BotTextMessage, 
 
 
 class TelegramMessenger(WebHookMessenger):
+    @property
+    def raw_client(self):
+        return self._messenger
+
     def set_web_hook_url(self, web_hook_url):
-        self.messenger.set_webhook(web_hook_url, self.default_handler.settings.ssl_cert)
+        self.raw_client.set_webhook(web_hook_url, self.default_handler.settings.ssl_cert)
 
     @property
     def get_handlers(self):
@@ -24,17 +28,17 @@ class TelegramMessenger(WebHookMessenger):
             raise ValueError(_("You need to specify access_token."))
 
         super().__init__(access_token, api_version, on_message_callback, bot, base_path)
-        self.messenger = telebot.TeleBot(access_token)
+        self._messenger = telebot.TeleBot(access_token)
 
     def send_text_message(self, message: BotTextMessage):
-        self.messenger.send_message(message.request.user_id, message.text)
+        self.raw_client.send_message(message.request.user_id, message.text)
 
     def send_button(self, message: BotButtonMessage):
         markup = types.ReplyKeyboardMarkup()
         for button in message.buttons:
             markup.add(button.title)
 
-        return self.messenger.send_message(message, message.text, reply_markup=markup, **message.kwargs)
+        return self.raw_client.send_message(message, message.text, reply_markup=markup, **message.kwargs)
 
     def send_image(self, message: BotImageMessage):
         if message.url:
@@ -43,7 +47,7 @@ class TelegramMessenger(WebHookMessenger):
             stream = open(message.path, "rb")
 
         try:
-            return self.messenger.send_photo(message.request.user_id, stream, **message.kwargs)
+            return self.raw_client.send_photo(message.request.user_id, stream, **message.kwargs)
         finally:
             stream.close()
 
@@ -51,7 +55,7 @@ class TelegramMessenger(WebHookMessenger):
         raise NotImplemented()
 
     def send_typing(self, message: BotTypingMessage):
-        return self.messenger.send_chat_action(message.request.user_id, 'typing')
+        return self.raw_client.send_chat_action(message.request.user_id, 'typing')
 
     def get_user_info(self, user_id) -> UserInfo:
         raise NotImplemented()
@@ -69,9 +73,10 @@ class TelegramMessenger(WebHookMessenger):
         if not data:
             return
 
-        data = json.loads(data.decode(), encoding=guess_json_utf(data))
-        message = data["message"]
+        json_data = json.loads(data.decode(), encoding=guess_json_utf(data))
+        update = telebot.types.Update.de_json(json_data)
+        message = update.message
 
         from python_bot.bot.bot import bot_logger
         bot_logger.debug("Received message: %s" % message)
-        self.on_message(message["chat"]["id"], message["text"])
+        self.on_message(message.from_user.id, message.text, data, message)

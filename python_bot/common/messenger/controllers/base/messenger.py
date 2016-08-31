@@ -39,6 +39,11 @@ class BaseMessenger(metaclass=abc.ABCMeta):
     def send_text_message(self, message: BotTextMessage):
         pass
 
+    @property
+    @abc.abstractmethod
+    def raw_client(self):
+        pass
+
     # @abc.abstractmethod
     # def send_generic_message(self, message: BotGenericMessage):
     #     pass
@@ -63,13 +68,13 @@ class BaseMessenger(metaclass=abc.ABCMeta):
     def get_user_info(self, user_id) -> UserInfo:
         pass
 
-    def on_message(self, user_id, text):
-        request = self.get_request(user_id, text)
+    def on_message(self, user_id, text, raw_response=None, extra=None):
+        request = self.get_request(user_id, text, raw_response, extra)
         if callable(self._on_message_callback):
             return self._on_message_callback(request)
 
-    def get_request(self, user_id, text):
-        return BotRequest(messenger=self, user_id=user_id, text=text)
+    def get_request(self, user_id, text, raw_response, extra):
+        return BotRequest(messenger=self, user_id=user_id, text=text, raw_response=raw_response, extra=extra)
 
     def handle(self, messages: list):
         for message in messages:
