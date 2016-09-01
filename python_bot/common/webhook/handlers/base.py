@@ -2,6 +2,8 @@ import abc
 
 from python_bot.settings import WebHookSettings
 
+__all__ = ["WebHookRequestHandler", "BaseWebHookHandler"]
+
 
 class WebHookRequestHandler:
     def __init__(self, process=None, can_process=None, request_type="POST"):

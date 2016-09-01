@@ -1,4 +1,3 @@
-from jsondb import Database
 from gettext import gettext as _
 from python_bot.common.storage.base import StorageAdapter, UserStorageAdapter
 
@@ -15,6 +14,7 @@ class JsonDatabaseAdapter(StorageAdapter):
         if "database_path" not in self.kwargs:
             raise ValueError(_("You need to specify database path"))
         database_path = self.kwargs.get("database_path")
+        from jsondb import Database
         self.database = Database(database_path)
 
     def _keys(self, filter_func=None):

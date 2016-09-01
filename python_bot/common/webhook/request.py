@@ -4,7 +4,9 @@ from gettext import gettext as _
 
 import dateutil.parser
 
-from python_bot.common.storage.base import UserStorageAdapter
+from python_bot.common.storage import UserStorageAdapter
+
+__all__ = ["BotRequest"]
 
 
 class BotRequest:

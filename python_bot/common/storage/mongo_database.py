@@ -1,5 +1,3 @@
-from pymongo import MongoClient
-
 from python_bot.common.storage.base import StorageAdapter, UserStorageAdapter
 
 
@@ -21,6 +19,7 @@ class MongoDatabaseAdapter(StorageAdapter):
         )
 
         # Use the default host and port
+        from pymongo import MongoClient
         self.client = MongoClient(self.database_uri)
 
         # Specify the name of the database
@@ -93,7 +92,7 @@ class MongoDatabaseAdapter(StorageAdapter):
             message_list = self.deserialize_messages(match["in_message_to"])
             match["in_message_to"] = message_list
 
-            results.append(Statement(statement_text, **match))
+            results.append(statement_text)
 
         return results
 
@@ -144,7 +143,7 @@ class MongoDatabaseAdapter(StorageAdapter):
         statement_text = values['text']
 
         del (values['text'])
-        return Statement(statement_text, **values)
+        return statement_text
 
     def remove(self, statement_text):
         """

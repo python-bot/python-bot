@@ -18,6 +18,8 @@ from python_bot.common.webhook.handlers.base import BaseWebHookHandler
 from python_bot.common.webhook.request import BotRequest
 from python_bot.settings import DEFAULT_BOT_SETTINGS
 
+__all__ = ["bot_logger", "PythonBot", "BotHandlerMixIn"]
+
 bot_logger = logging.getLogger('PythonBot')
 _formatter = logging.Formatter(
     '%(asctime)s (%(filename)s:%(lineno)d %(threadName)s) %(levelname)s - %(name)s: "%(message)s"'
@@ -221,11 +223,3 @@ class PythonBot(LocalizationMixIn, MiddlewareHandlerMixIn, BotHandlerMixIn):
 
             self.web_hook_handler.set_handlers(handlers, base_path)
             return self.web_hook_handler, base_path
-
-
-if __name__ == "__main__":
-    a = PythonBot()
-    from python_bot.common.messenger.controllers.console import ConsoleMessenger
-
-    r = ConsoleMessenger().get_request(1, "test")
-    d = a.on_message(r)

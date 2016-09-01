@@ -8,9 +8,10 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 import ssl
 from threading import Thread
 
-from python_bot.bot.bot import bot_logger
 from python_bot.common.webhook.handlers.base import BaseWebHookHandler
 from python_bot.settings import WebHookSettings
+
+__all__ = ["PurePythonHandler"]
 
 
 class PurePythonHandler(BaseWebHookHandler):
@@ -22,6 +23,7 @@ class PurePythonHandler(BaseWebHookHandler):
 
     def __get_server_class(self):
         that = self
+        from python_bot.bot.bot import bot_logger
 
         class WebhookHandler(BaseHTTPRequestHandler):
             server_version = "PythonBotWebhookHandler/1.0"
@@ -71,6 +73,7 @@ class PurePythonHandler(BaseWebHookHandler):
         self.__server.serve_forever()
 
     def start(self):
+        from python_bot.bot.bot import bot_logger
         bot_logger.debug("Starting http server")
         if self.__server_thread:
             bot_logger.debug("Calling start before stop")
@@ -80,6 +83,7 @@ class PurePythonHandler(BaseWebHookHandler):
         self.__server_thread.start()
 
     def stop(self):
+        from python_bot.bot.bot import bot_logger
         bot_logger.debug("Stopping http server")
         if not self.__server:
             bot_logger.debug("Server is not running")

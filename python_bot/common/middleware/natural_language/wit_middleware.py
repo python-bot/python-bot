@@ -1,7 +1,7 @@
-from wit import Wit
-
 from python_bot.common.middleware.base import MiddlewareMixin
 from python_bot.common.webhook.request import BotRequest
+
+__all__ = ["WitMiddleware"]
 
 
 class WitMiddleware(MiddlewareMixin):
@@ -9,6 +9,7 @@ class WitMiddleware(MiddlewareMixin):
     WIT_CONTEXT_KEY = "_context"
 
     def __init__(self, *args, **kwargs):
+        from wit import Wit
         self.access_token = kwargs.pop("access_token", None)
         self.actions = kwargs.pop("actions", {})
         self.client = Wit(access_token=self.access_token, actions=self.actions)

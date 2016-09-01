@@ -1,7 +1,5 @@
 import functools
 
-from slackclient import SlackClient
-
 from python_bot.common.messenger.controllers.base.messenger import UserInfo, PollingMessenger
 from python_bot.common.webhook.message import BotButtonMessage, BotTextMessage, BotImageMessage, \
     BotPersistentMenuMessage, BotTypingMessage
@@ -20,6 +18,7 @@ class SlackMessenger(PollingMessenger):
     @property
     @functools.lru_cache()
     def raw_client(self):
+        from slackclient import SlackClient
         return SlackClient(token=self.access_token)
 
     def get_request(self, user_id, text, **kwargs):

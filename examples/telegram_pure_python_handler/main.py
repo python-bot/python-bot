@@ -1,13 +1,8 @@
 import logging
 
-from python_bot.bot import PythonBot
-from python_bot.bot.bot import bot_logger
-from python_bot.common.messenger.controllers.telegram import TelegramMessenger
-from python_bot.common.middleware.base import MiddlewareMixin
-from python_bot.common.utils.colorize import PrintHelper
-from python_bot.common.webhook.handlers.python_handler import PurePythonHandler
-from python_bot.common.webhook.message import BotTextMessage
-from python_bot.common.webhook.request import BotRequest
+from python_bot.bot import PythonBot, bot_logger
+from python_bot.common import TelegramMessenger, MiddlewareMixin, PrintHelper, PurePythonHandler,\
+    BotTextMessage, BotRequest
 from python_bot.settings import WebHookSettings
 
 # Getting Your Token

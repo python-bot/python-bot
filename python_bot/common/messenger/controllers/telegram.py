@@ -1,9 +1,7 @@
 import json
 
 import requests
-import telebot
 from requests.utils import guess_json_utf
-from telebot import types
 from gettext import gettext as _
 from python_bot.common.messenger.controllers.base.messenger import UserInfo, WebHookMessenger
 from python_bot.common.webhook.handlers.base import WebHookRequestHandler
@@ -28,13 +26,15 @@ class TelegramMessenger(WebHookMessenger):
             raise ValueError(_("You need to specify access_token."))
 
         super().__init__(access_token, api_version, on_message_callback, bot, base_path)
+        import telebot
         self._messenger = telebot.TeleBot(access_token)
 
     def send_text_message(self, message: BotTextMessage):
         self.raw_client.send_message(message.request.user_id, message.text)
 
     def send_button(self, message: BotButtonMessage):
-        markup = types.ReplyKeyboardMarkup()
+        import telebot
+        markup = telebot.types.ReplyKeyboardMarkup()
         for button in message.buttons:
             markup.add(button.title)
 
@@ -73,6 +73,7 @@ class TelegramMessenger(WebHookMessenger):
         if not data:
             return
 
+        import telebot
         json_data = json.loads(data.decode(), encoding=guess_json_utf(data))
         update = telebot.types.Update.de_json(json_data)
         message = update.message

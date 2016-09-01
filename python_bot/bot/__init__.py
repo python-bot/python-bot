@@ -1,1 +1,1 @@
-from .bot import PythonBot
+from .bot import PythonBot, bot_logger

@@ -9,6 +9,8 @@ from python_bot.common.webhook.request import BotRequest
 from python_bot.common.webhook.message import BotButtonMessage, BotTextMessage, BotImageMessage, \
     BotTypingMessage, BotPersistentMenuMessage, BotMessage
 
+__all__ = ["UserInfo", "BaseMessenger", "PollingMessenger", "WebHookMessenger"]
+
 
 class UserInfo:
     user_id = 0
@@ -73,7 +75,7 @@ class BaseMessenger(metaclass=abc.ABCMeta):
         if callable(self._on_message_callback):
             return self._on_message_callback(request)
 
-    def get_request(self, user_id, text, raw_response, extra):
+    def get_request(self, user_id, text, raw_response=None, extra=None):
         return BotRequest(messenger=self, user_id=user_id, text=text, raw_response=raw_response, extra=extra)
 
     def handle(self, messages: list):

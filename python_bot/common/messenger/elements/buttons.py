@@ -3,6 +3,8 @@ import json
 
 from gettext import gettext as _
 
+__all__ = ["Button", "PhoneNumberButton", "QuickReply"]
+
 
 class Button(metaclass=abc.ABCMeta):
     @property
@@ -39,7 +41,7 @@ class PhoneNumberButton(Button):
     def __init__(self, title, phone_number):
         if not phone_number or phone_number[0] != "+":
             raise ValueError(_('Phone_number payload format mush be ‘+’ prefix followed by the country code, '
-                             'area code and local number'))
+                               'area code and local number'))
         super().__init__(title=title)
 
 

@@ -1,16 +1,11 @@
 import json
 
-from django.http import HttpResponse
-from django.utils.decorators import method_decorator
-from django.views import generic
-from django.views.decorators.csrf import csrf_exempt
-
-
 from python_bot.common.webhook.handlers.base import BaseWebHookHandler
+
+__all__ = ["DjangoFacebookAdapter"]
 
 
 class DjangoFacebookAdapter(BaseWebHookHandler):
-
     def stop(self):
         # create urls and start to django
         pass
@@ -21,6 +16,10 @@ class DjangoFacebookAdapter(BaseWebHookHandler):
 
     def create_view(self):
         that = self
+        from django.http import HttpResponse
+        from django.utils.decorators import method_decorator
+        from django.views import generic
+        from django.views.decorators.csrf import csrf_exempt
 
         class DjangoView(generic.View):
             def get(self, request, *args, **kwargs):
@@ -52,5 +51,5 @@ class DjangoFacebookAdapter(BaseWebHookHandler):
                         # elif "postback" in message and "payload" in message["postback"]:
                         #     post_facebook_message(message['sender']['id'], payload=message["postback"]['payload'])
                 return HttpResponse()
-        return DjangoView.as_view()
 
+        return DjangoView.as_view()

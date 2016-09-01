@@ -1,7 +1,5 @@
 from python_bot.bot import PythonBot
-from python_bot.common.storage.json_database import UserJsonDatabaseAdapter
-from python_bot.common.webhook.message import BotTextMessage
-from python_bot.common.webhook.request import BotRequest
+from python_bot.common import UserJsonDatabaseAdapter, BotTextMessage, BotRequest
 
 
 def echo_middleware(get_message):

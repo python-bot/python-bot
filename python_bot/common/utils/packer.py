@@ -1,12 +1,14 @@
 import base64
 
+__all__ = ["pack_string", "unpack_string"]
 
-def int_encode(x):
+
+def __int_encode(x):
     b = x.to_bytes((x.bit_length() // 8) + 1, byteorder='little')
     return base64.b85encode(b).decode()
 
 
-def int_decode(string):
+def __int_decode(string):
     b = base64.b85decode(string.encode())
     return int.from_bytes(b, byteorder='little')
 
@@ -15,7 +17,7 @@ def pack_string(*args):
     results = []
     for i in args:
         if isinstance(i, int):
-            results.append(int_encode(i))
+            results.append(__int_encode(i))
         else:
             results.append(base64.b85encode(str(i).encode()).decode())
     return " ".join(results)
@@ -32,14 +34,7 @@ def unpack_string(data, types):
     result = []
     for d, t in zip(data, types):
         if t == int:
-            result.append(int_decode(d))
+            result.append(__int_decode(d))
         else:
             result.append(base64.b85decode(d.encode()).decode())
     return result
-
-
-if __name__ == "__main__":
-    print(len(pack_string(10**100+1)))
-    print(len("133124513"+ "abcvedfdsfsdgdsddddd"))
-    print(unpack_string(pack_string(133124513, "Привет я сергей ковалев"), types=[int, str]))
-    print(unpack_string("ddd", types=[int, str]))

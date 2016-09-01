@@ -2,6 +2,8 @@ import functools
 
 from python_bot.common.utils.path import load_module
 
+__all__ = ["MiddlewareHandlerMixIn"]
+
 
 class MiddlewareHandlerMixIn(object):
     def __init__(self):

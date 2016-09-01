@@ -2,6 +2,8 @@ import abc
 
 from python_bot.common.models import BaseModule
 
+__all__ = ["BaseTokenizer"]
+
 
 class BaseTokenizer(BaseModule):
     @abc.abstractmethod

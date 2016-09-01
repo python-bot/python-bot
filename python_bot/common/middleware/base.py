@@ -1,3 +1,4 @@
+__all__ = ["MiddlewareMixin"]
 
 
 class MiddlewareMixin(object):

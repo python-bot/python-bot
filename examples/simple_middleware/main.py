@@ -1,6 +1,5 @@
 from python_bot.bot import PythonBot
-from python_bot.common.messenger.controllers.console import ConsoleMessenger
-from python_bot.common.webhook.message import BotTextMessage
+from python_bot.common import ConsoleMessenger, BotTextMessage
 
 
 def echo_middleware(get_message):
