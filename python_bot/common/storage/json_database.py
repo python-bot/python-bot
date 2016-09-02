@@ -8,6 +8,11 @@ class JsonDatabaseAdapter(StorageAdapter):
     to store the conversation as a Json-encoded file.
     """
 
+    def create_user_storage(self, **kwargs):
+        _kwargs = self.kwargs.copy()
+        _kwargs.update(kwargs)
+        return UserJsonDatabaseAdapter(**_kwargs)
+
     def __init__(self, **kwargs):
         super(JsonDatabaseAdapter, self).__init__(**kwargs)
 

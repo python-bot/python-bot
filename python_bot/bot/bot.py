@@ -114,12 +114,11 @@ class BotHandlerMixIn:
 
 class PythonBot(LocalizationMixIn, MiddlewareHandlerMixIn, BotHandlerMixIn):
     def __init__(self,
-                 messengers=None, storage=None, user_storage=None,
-                 middleware=None, tokenizer=None, locale=None, web_hook=None):
+                 messengers=None, storage=None, middleware=None,
+                 tokenizer=None, locale=None, web_hook=None):
         self._user_settings = {
             "messengers": messengers or (),
             "storage": storage,
-            "user_storage": user_storage,
             "middleware": middleware or (),
             "tokenizer": tokenizer or OrderedDict(),
             "locale": locale or OrderedDict(),
@@ -165,9 +164,10 @@ class PythonBot(LocalizationMixIn, MiddlewareHandlerMixIn, BotHandlerMixIn):
 
         Returns:
             Instance of StorageAdapter."""
+
         if self.settings["storage"]:
-            first_item = next(iter(self.settings["storage"].items()))
-            return load_module({"entry": first_item[0], "params": first_item[1]})
+            params = {}
+            return PythonBot.load_module(self.settings["storage"], params)
 
     @property
     @functools.lru_cache()

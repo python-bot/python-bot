@@ -8,6 +8,11 @@ class MongoDatabaseAdapter(StorageAdapter):
     to store the conversation as a MongoDB database.
     """
 
+    def create_user_storage(self, **kwargs):
+        _kwargs = self.kwargs.copy()
+        _kwargs.update(kwargs)
+        return UserMongoDatabaseAdapter(**_kwargs)
+
     def __init__(self, **kwargs):
         super(MongoDatabaseAdapter, self).__init__(**kwargs)
 

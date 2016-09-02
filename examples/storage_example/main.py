@@ -1,5 +1,5 @@
 from python_bot.bot import PythonBot
-from python_bot.common import UserJsonDatabaseAdapter, BotTextMessage, BotRequest
+from python_bot.common import BotTextMessage, BotRequest, JsonDatabaseAdapter
 
 
 def echo_middleware(get_message):
@@ -24,6 +24,6 @@ def echo_middleware(get_message):
 with PythonBot(
         middleware=[echo_middleware],
         messengers=[],
-        user_storage=[UserJsonDatabaseAdapter, {"database_path": "./user.db"}]
+        storage=[JsonDatabaseAdapter, {"database_path": "./user.db"}]
 ) as bot:
     bot.converse()

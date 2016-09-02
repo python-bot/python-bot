@@ -26,6 +26,11 @@ class StorageAdapter(Adapter):
     that all storage adapters should implement.
     """
 
+    @staticmethod
+    @abc.abstractmethod
+    def create_user_storage(self, **kwargs):
+        pass
+
     def __init__(self, **kwargs):
         super(StorageAdapter, self).__init__(**kwargs)
 

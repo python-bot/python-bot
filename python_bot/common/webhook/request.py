@@ -30,10 +30,9 @@ class BotRequest:
         """Cached Property for persistence storage
         Returns:
             UserStorageAdapter can be any kind of storage."""
-        if self.messenger.bot.settings["user_storage"]:
+        if self.messenger.bot.storage:
             params = {"user_id": self.user_id, "database_name": self.messenger.__class__.__name__}
-            from python_bot.bot import PythonBot
-            return PythonBot.load_module(self.messenger.bot.settings["user_storage"], params)
+            return self.messenger.bot.storage.create_user_storage(**params)
 
     def is_positive(self):
         return any(filter(lambda x: x in self.text.lower().split(),
