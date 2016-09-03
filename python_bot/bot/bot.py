@@ -7,6 +7,7 @@ import sys
 
 import functools
 
+from python_bot.common import BotTextMessage
 from python_bot.common.localization.handler import LocalizationMixIn
 from python_bot.common.messenger.controllers.base.messenger import WebHookMessenger, PollingMessenger
 from python_bot.common.middleware.handler import MiddlewareHandlerMixIn
@@ -97,7 +98,10 @@ class BotHandlerMixIn:
                 print(user_input)
             if user_input:
                 from python_bot.common.messenger.controllers.console import ConsoleMessenger
-                ConsoleMessenger(on_message_callback=self.on_message, bot=self).on_message(1, user_input)
+                console = ConsoleMessenger(on_message_callback=self.on_message, bot=self)
+                console.on_message(
+                    BotTextMessage(user=console.get_user_info(1), text=user_input)
+                )
 
     def on_message(self, request: BotRequest):
         """Callback method received from messenger.

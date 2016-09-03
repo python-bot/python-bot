@@ -3,10 +3,12 @@ import json
 import requests
 from requests.utils import guess_json_utf
 from gettext import gettext as _
-from python_bot.common.messenger.controllers.base.messenger import UserInfo, WebHookMessenger
+from python_bot.common.messenger.controllers.base.messenger import WebHookMessenger
+from python_bot.common.messenger.elements.base import UserInfo
+from python_bot.common.messenger.elements.message import create_message
 from python_bot.common.webhook.handlers.base import WebHookRequestHandler
-from python_bot.common.webhook.message import BotButtonMessage, BotTextMessage, BotImageMessage, \
-    BotTypingMessage, BotPersistentMenuMessage
+from python_bot.common.webhook.message import BotButtonResponse, BotTextResponse, BotImageResponse, \
+    BotTypingResponse, BotPersistentMenuResponse
 
 
 class TelegramMessenger(WebHookMessenger):
@@ -29,10 +31,10 @@ class TelegramMessenger(WebHookMessenger):
         import telebot
         self._messenger = telebot.TeleBot(access_token)
 
-    def send_text_message(self, message: BotTextMessage):
-        self.raw_client.send_message(message.request.user_id, message.text)
+    def send_text_message(self, message: BotTextResponse):
+        self.raw_client.send_message(message.request_user_id, message.text)
 
-    def send_button(self, message: BotButtonMessage):
+    def send_button(self, message: BotButtonResponse):
         import telebot
         markup = telebot.types.ReplyKeyboardMarkup()
         for button in message.buttons:
@@ -40,22 +42,22 @@ class TelegramMessenger(WebHookMessenger):
 
         return self.raw_client.send_message(message, message.text, reply_markup=markup, **message.kwargs)
 
-    def send_image(self, message: BotImageMessage):
+    def send_image(self, message: BotImageResponse):
         if message.url:
             stream = requests.get(message.url, stream=True).raw
         else:
             stream = open(message.path, "rb")
 
         try:
-            return self.raw_client.send_photo(message.request.user_id, stream, **message.kwargs)
+            return self.raw_client.send_photo(message.request_user_id, stream, **message.kwargs)
         finally:
             stream.close()
 
-    def set_persistent_menu(self, message: BotPersistentMenuMessage):
+    def set_persistent_menu(self, message: BotPersistentMenuResponse):
         raise NotImplemented()
 
-    def send_typing(self, message: BotTypingMessage):
-        return self.raw_client.send_chat_action(message.request.user_id, 'typing')
+    def send_typing(self, message: BotTypingResponse):
+        return self.raw_client.send_chat_action(message.request_user_id, 'typing')
 
     def get_user_info(self, user_id) -> UserInfo:
         raise NotImplemented()
@@ -76,8 +78,20 @@ class TelegramMessenger(WebHookMessenger):
         import telebot
         json_data = json.loads(data.decode(), encoding=guess_json_utf(data))
         update = telebot.types.Update.de_json(json_data)
-        message = update.message
+        telegram_message = update.message
 
         from python_bot.bot.bot import bot_logger
-        bot_logger.debug("Received message: %s" % message)
-        self.on_message(message.from_user.id, message.text, data, message)
+        bot_logger.debug("Received message: %s" % telegram_message)
+        user = telegram_message.from_user
+
+        message = create_message(telegram_message.content_type,
+                                 user=UserInfo(user.id, user.first_name, user.last_name, user.username),
+                                 date=telegram_message.date,
+                                 text=telegram_message.text,
+                                 message_id=user.id)
+
+        if not message:
+            bot_logger.debug("Failed to initiate message data for content type [%s]" % message.content_Type)
+            return
+
+        self.on_message(message, data, extra=telegram_message)

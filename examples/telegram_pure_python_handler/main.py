@@ -2,7 +2,7 @@ import logging
 
 from python_bot.bot import PythonBot, bot_logger
 from python_bot.common import TelegramMessenger, MiddlewareMixin, PrintHelper, PurePythonHandler,\
-    BotTextMessage, BotRequest
+    BotTextResponse, BotRequest
 from python_bot.settings import WebHookSettings
 
 # Getting Your Token
@@ -10,7 +10,7 @@ from python_bot.settings import WebHookSettings
 # and basically follow the instructions on the Telegram website:
 # https://core.telegram.org/bots#3-how-do-i-create-a-bot
 
-ACCESS_TOKEN = '{ACCESS_TOKEN}'
+ACCESS_TOKEN = '232638781:AAGNCvFmX6KAicfzeudCcCL-0dkJ5tUrKFw'
 
 # For development purposes, we will use Ngrok that sets up secure tunnels to our localhost i.e.
 # Ngrok gives web accessible URLs and tunnels all traffic from that URL to our localhost!
@@ -19,7 +19,7 @@ ACCESS_TOKEN = '{ACCESS_TOKEN}'
 # Now any outside computer can reach your localhost server at https://{unique_id}.ngrok.io
 # Copy this unique_id to NGROK_URL
 
-NGROK_URL = 'https://{unique_id}.ngrok.io'
+NGROK_URL = 'https://094675a5.ngrok.io'
 
 
 # Now we need to override web hook url to our NGROK_URL
@@ -36,7 +36,7 @@ helper = PrintHelper()
 # We also create middleware which print user request and answer hello
 class CustomMiddleware(MiddlewareMixin):
     def process_message(self, request: BotRequest, messages):
-        messages.append(BotTextMessage(request, "Hello!"))
+        messages.append(BotTextResponse(request, "Hello!"))
         helper.header("End message")
         return messages
 

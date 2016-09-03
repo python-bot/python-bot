@@ -1,33 +1,14 @@
 import abc
 import urllib.parse
-import os
 
-from gettext import gettext as _
-
+from python_bot.common.messenger.elements.base import UserInfo
+from python_bot.common.messenger.elements.message import BotBaseMessage
 from python_bot.common.webhook.handlers.base import BaseWebHookHandler
+from python_bot.common.webhook.message import BotButtonResponse, BotTextResponse, BotImageResponse, \
+    BotTypingResponse, BotPersistentMenuResponse
 from python_bot.common.webhook.request import BotRequest
-from python_bot.common.webhook.message import BotButtonMessage, BotTextMessage, BotImageMessage, \
-    BotTypingMessage, BotPersistentMenuMessage, BotMessage
 
-__all__ = ["UserInfo", "BaseMessenger", "PollingMessenger", "WebHookMessenger"]
-
-
-class UserInfo:
-    user_id = 0
-    first_name = ""
-    last_name = ""
-    profile_pic = ""
-    locale = None
-    timezone = None  # float (min: -24) (max: 24)
-    is_male = True
-
-    def __str__(self):
-        out = "%s: %s %s " % (self.user_id, self.first_name, self.last_name)
-        if self.locale:
-            out += os.linesep + _("Locale: ") + self.locale
-        if self.timezone:
-            out += os.linesep + _("Timezone: ") + str(self.timezone)
-        return out
+__all__ = ["BaseMessenger", "PollingMessenger", "WebHookMessenger"]
 
 
 class BaseMessenger(metaclass=abc.ABCMeta):
@@ -38,7 +19,7 @@ class BaseMessenger(metaclass=abc.ABCMeta):
         self.bot = bot
 
     @abc.abstractmethod
-    def send_text_message(self, message: BotTextMessage):
+    def send_text_message(self, message: BotTextResponse):
         pass
 
     @property
@@ -51,44 +32,44 @@ class BaseMessenger(metaclass=abc.ABCMeta):
     #     pass
 
     @abc.abstractmethod
-    def send_button(self, message: BotButtonMessage):
+    def send_button(self, message: BotButtonResponse):
         pass
 
     @abc.abstractmethod
-    def send_image(self, message: BotImageMessage):
+    def send_image(self, message: BotImageResponse):
         pass
 
     @abc.abstractmethod
-    def set_persistent_menu(self, message: BotPersistentMenuMessage):
+    def set_persistent_menu(self, message: BotPersistentMenuResponse):
         pass
 
     @abc.abstractmethod
-    def send_typing(self, message: BotTypingMessage):
+    def send_typing(self, message: BotTypingResponse):
         pass
 
     @abc.abstractmethod
     def get_user_info(self, user_id) -> UserInfo:
         pass
 
-    def on_message(self, user_id, text, raw_response=None, extra=None):
-        request = self.get_request(user_id, text, raw_response, extra)
+    def on_message(self, message: BotBaseMessage, raw_response=None, extra=None):
+        request = self.get_request(message, raw_response, extra)
         if callable(self._on_message_callback):
             return self._on_message_callback(request)
 
-    def get_request(self, user_id, text, raw_response=None, extra=None):
-        return BotRequest(messenger=self, user_id=user_id, text=text, raw_response=raw_response, extra=extra)
+    def get_request(self, message, raw_response=None, extra=None):
+        return BotRequest(messenger=self, message=message, raw_response=raw_response, extra=extra)
 
     def handle(self, messages: list):
         for message in messages:
-            if isinstance(message, BotTextMessage):
+            if isinstance(message, BotTextResponse):
                 self.send_text_message(message)
-            elif isinstance(message, BotButtonMessage):
+            elif isinstance(message, BotButtonResponse):
                 self.send_button(message)
-            elif isinstance(message, BotImageMessage):
+            elif isinstance(message, BotImageResponse):
                 self.send_image(message)
-            elif isinstance(message, BotPersistentMenuMessage):
+            elif isinstance(message, BotPersistentMenuResponse):
                 self.set_persistent_menu(message)
-            elif isinstance(message, BotTypingMessage):
+            elif isinstance(message, BotTypingResponse):
                 self.send_typing(message)
             else:
                 raise ValueError("Message handler not found for message: [%s]" % message)

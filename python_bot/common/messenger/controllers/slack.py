@@ -1,8 +1,9 @@
 import functools
 
-from python_bot.common.messenger.controllers.base.messenger import UserInfo, PollingMessenger
-from python_bot.common.webhook.message import BotButtonMessage, BotTextMessage, BotImageMessage, \
-    BotPersistentMenuMessage, BotTypingMessage
+from python_bot.common.messenger.controllers.base.messenger import PollingMessenger
+from python_bot.common.messenger.elements.base import UserInfo
+from python_bot.common.webhook.message import BotButtonResponse, BotTextResponse, BotImageResponse, \
+    BotPersistentMenuResponse, BotTypingResponse
 from python_bot.common.webhook.request import BotRequest
 
 
@@ -33,20 +34,20 @@ class SlackMessenger(PollingMessenger):
         if callable(self._on_message_callback):
             return self._on_message_callback(request)
 
-    def send_button(self, message: BotButtonMessage):
+    def send_button(self, message: BotButtonResponse):
         raise NotImplemented()
 
-    def send_text_message(self, message: BotTextMessage):
+    def send_text_message(self, message: BotTextResponse):
         raise NotImplemented()
 
-    def send_typing(self, message: BotTypingMessage):
+    def send_typing(self, message: BotTypingResponse):
         raise NotImplemented()
 
-    def set_persistent_menu(self, message: BotPersistentMenuMessage):
+    def set_persistent_menu(self, message: BotPersistentMenuResponse):
         raise NotImplemented()
 
     def get_user_info(self, user_id) -> UserInfo:
         raise NotImplemented()
 
-    def send_image(self, message: BotImageMessage):
+    def send_image(self, message: BotImageResponse):
         raise NotImplemented()

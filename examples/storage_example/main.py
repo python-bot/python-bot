@@ -1,5 +1,5 @@
 from python_bot.bot import PythonBot
-from python_bot.common import BotTextMessage, BotRequest, JsonDatabaseAdapter
+from python_bot.common import BotTextResponse, BotRequest, JsonDatabaseAdapter
 
 
 def echo_middleware(get_message):
@@ -11,7 +11,7 @@ def echo_middleware(get_message):
         pre_message = request.user_storage.get("prev_message")
 
         message = "Previous message was: %s" % pre_message if pre_message else "Say hello"
-        messages.append(BotTextMessage(request, message))
+        messages.append(BotTextResponse(request, message))
 
         request.user_storage.update("prev_message", request.text)
 

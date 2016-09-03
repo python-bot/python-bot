@@ -5,10 +5,11 @@ import requests
 from requests_toolbelt import MultipartEncoder
 from gettext import gettext as _
 
-from python_bot.common.messenger.controllers.base.messenger import UserInfo, BaseMessenger, WebHookMessenger
+from python_bot.common.messenger.controllers.base.messenger import BaseMessenger, WebHookMessenger
+from python_bot.common.messenger.elements.base import UserInfo
 from python_bot.common.webhook.handlers.base import WebHookRequestHandler
-from python_bot.common.webhook.message import BotButtonMessage, BotTextMessage, BotImageMessage, \
-    BotTypingMessage, BotPersistentMenuMessage
+from python_bot.common.webhook.message import BotButtonResponse, BotTextResponse, BotImageResponse, \
+    BotTypingResponse, BotPersistentMenuResponse
 
 
 class FacebookMessenger(WebHookMessenger):
@@ -38,10 +39,10 @@ class FacebookMessenger(WebHookMessenger):
             "https://graph.facebook.com/v{0}/me/thread_settings?access_token={1}"
         ).format(self.api_version, access_token)
 
-    def send_text_message(self, message: BotTextMessage):
+    def send_text_message(self, message: BotTextResponse):
         payload = {
             'recipient': {
-                'id': message.request.user_id
+                'id': message.request_user_id
             },
             'message': {
                 'text': message,
@@ -55,10 +56,10 @@ class FacebookMessenger(WebHookMessenger):
     # def send_generic_message(self, message: BotGenericMessage):
     #     pass
 
-    def send_button(self, message: BotButtonMessage):
+    def send_button(self, message: BotButtonResponse):
         payload = {
             'recipient': {
-                'id': message.request.user_id
+                'id': message.request_user_id
             },
             'message': {
                 "attachment": {
@@ -73,7 +74,7 @@ class FacebookMessenger(WebHookMessenger):
         }
         return self._send_payload(payload)
 
-    def send_image(self, message: BotImageMessage):
+    def send_image(self, message: BotImageResponse):
         """
           This sends an image to the specified recipient.
           Image must be PNG or JPEG or GIF.
@@ -85,7 +86,7 @@ class FacebookMessenger(WebHookMessenger):
             payload = {
                 'recipient': json.dumps(
                     {
-                        'id': message.request.user_id
+                        'id': message.request_user_id
                     }
                 ),
                 'message': json.dumps(
@@ -106,7 +107,7 @@ class FacebookMessenger(WebHookMessenger):
         elif message.url:
             payload = {
                 "recipient": {
-                    "id": message.request.user_id
+                    "id": message.request_user_id
                 },
                 "message": {
                     "attachment": {
@@ -122,7 +123,7 @@ class FacebookMessenger(WebHookMessenger):
         else:
             ValueError(_("Image url either image path should be set"))
 
-    def set_persistent_menu(self, message: BotPersistentMenuMessage):
+    def set_persistent_menu(self, message: BotPersistentMenuResponse):
         data = {
             "setting_type": "call_to_actions",
             "thread_state": "existing_thread",
@@ -130,11 +131,11 @@ class FacebookMessenger(WebHookMessenger):
         }
         return self._send_thread_settings(data)
 
-    def send_typing(self, message: BotTypingMessage):
+    def send_typing(self, message: BotTypingResponse):
         payload = {
             'recipient': json.dumps(
                 {
-                    'id': message.request.user_id
+                    'id': message.request_user_id
                 }
             ),
             'sender_action': 'typing_' + ("on" if message.on else "off")
@@ -147,13 +148,16 @@ class FacebookMessenger(WebHookMessenger):
         user_details_params = {'fields': 'first_name,last_name,gender,locale,timezone',
                                'access_token': self.access_token}
         user_details = requests.get(user_details_url, user_details_params).json()
-        user = UserInfo()
-        user.is_male = user_details.get("gender") == "male"
-        user.first_name = user_details.get("first_name")
-        user.last_name = user_details.get("last_name")
-        user.locale = user_details.get("locale")
-        user.timezone = user_details.get("timezone")
-        user.profile_pic = "https://graph.facebook.com/%s/picture" % user_id
+        user = UserInfo(
+            user_id,
+            first_name=user_details.get("first_name"),
+            last_name=user_details.get("last_name"),
+            is_male=user_details.get("gender") == "male",
+            locale=user_details.get("locale"),
+            timezone=user_details.get("timezone"),
+            profile_pic="https://graph.facebook.com/%s/picture" % user_id
+        )
+
         return user
 
     def _send_generic_message(self, user_id, elements):
