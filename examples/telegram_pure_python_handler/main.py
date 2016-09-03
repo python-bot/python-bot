@@ -10,7 +10,7 @@ from python_bot.settings import WebHookSettings
 # and basically follow the instructions on the Telegram website:
 # https://core.telegram.org/bots#3-how-do-i-create-a-bot
 
-ACCESS_TOKEN = '232638781:AAGNCvFmX6KAicfzeudCcCL-0dkJ5tUrKFw'
+ACCESS_TOKEN = '{ACCESS_TOKEN}'
 
 # For development purposes, we will use Ngrok that sets up secure tunnels to our localhost i.e.
 # Ngrok gives web accessible URLs and tunnels all traffic from that URL to our localhost!
@@ -19,7 +19,7 @@ ACCESS_TOKEN = '232638781:AAGNCvFmX6KAicfzeudCcCL-0dkJ5tUrKFw'
 # Now any outside computer can reach your localhost server at https://{unique_id}.ngrok.io
 # Copy this unique_id to NGROK_URL
 
-NGROK_URL = 'https://094675a5.ngrok.io'
+NGROK_URL = 'https://{unique_id}.ngrok.io'
 
 
 # Now we need to override web hook url to our NGROK_URL
