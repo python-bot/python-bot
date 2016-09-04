@@ -17,6 +17,11 @@ class BotResponse:
         if self.request and self.request.message.user:
             return self.request.message.user.user_id
 
+    @property
+    def request_message_id(self):
+        if self.request and self.request.message:
+            return self.request.message.message_id
+
     def to_json(self):
         pass
 

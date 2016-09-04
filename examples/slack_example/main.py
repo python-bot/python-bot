@@ -10,12 +10,13 @@ from python_bot.settings import WebHookSettings
 # https://api.slack.com/bot-users
 # and sign up to create your own Slack team.
 # You can also sign into an existing account where you have administrative privileges.
+from python_bot.tests.common.middleware import EchoMiddleware
 
 ACCESS_TOKEN = '{ACCESS_TOKEN}'
 
-BOT_NAME = '{NOT_NAME}'
+BOT_NAME = '{BOT_NAME}'
 bot_logger.setLevel(logging.DEBUG)
-with PythonBot() as bot:
+with PythonBot(middleware=[EchoMiddleware]) as bot:
     slack = bot.add_messenger(SlackMessenger, access_token=ACCESS_TOKEN)
     bot.start(wait=False)
 
@@ -28,3 +29,5 @@ with PythonBot() as bot:
                 print("Bot ID for '" + user['name'] + "' is " + user.get('id'))
     else:
         print("could not find bot user with the name " + BOT_NAME)
+
+    bot.wait()

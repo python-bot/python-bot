@@ -1,5 +1,7 @@
+import datetime
 import functools
 
+from python_bot.common import create_message
 from python_bot.common.messenger.controllers.base.messenger import PollingMessenger
 from python_bot.common.messenger.elements.base import UserInfo
 from python_bot.common.webhook.message import BotButtonResponse, BotTextResponse, BotImageResponse, \
@@ -11,9 +13,14 @@ class SlackMessenger(PollingMessenger):
         info_from_server = self.raw_client.rtm_read()
         for block in info_from_server:
             if block['type'] == 'message':
-                self.on_message(user_id=block['user'],
-                                text=block['text'],
-                                channel=block['channel'])
+                bot_message = create_message(
+                    "text",
+                    user=UserInfo(block["user"]),
+                    date=datetime.datetime.fromtimestamp(float(block['ts'])),
+                    text=block['text'],
+                    message_id=block['channel']
+                )
+                self.on_message(bot_message, extra=block)
 
     @property
     @functools.lru_cache()
@@ -29,7 +36,8 @@ class SlackMessenger(PollingMessenger):
         raise NotImplemented()
 
     def send_text_message(self, message: BotTextResponse):
-        raise NotImplemented()
+        self.raw_client.api_call("chat.postMessage", channel=message.request_message_id,
+                                 text=message.text, as_user=False)
 
     def send_typing(self, message: BotTypingResponse):
         raise NotImplemented()
