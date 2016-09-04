@@ -9,7 +9,7 @@ import functools
 
 from python_bot.common import BotTextMessage
 from python_bot.common.localization.handler import LocalizationMixIn
-from python_bot.common.messenger.controllers.base.messenger import WebHookMessenger, PollingMessenger
+from python_bot.common.messenger.controllers.base.messenger import WebHookMessenger, PollingMessenger, BaseMessenger
 from python_bot.common.middleware.handler import MiddlewareHandlerMixIn
 from python_bot.common.storage.base import StorageAdapter
 from python_bot.common.tokenizer.base import BaseTokenizer
@@ -33,107 +33,22 @@ bot_logger.addHandler(console_output_handler)
 bot_logger.setLevel(logging.ERROR)
 
 
-class BotHandlerMixIn:
-    request_class = BotRequest
-
-    @property
-    @functools.lru_cache()
-    def messengers(self) -> list:
-        """Lazy Property list of messenger
-
-        Returns:
-            List of BaseMessenger objects corresponding to user settings."""
-        result = []
-        for entry in self.settings["messengers"]:
-            params = {"on_message_callback": self.on_message, "bot": self}
-
-            mod = PythonBot.load_module(entry, params)
-            if mod:
-                result.append(mod)
-        return result
-
-    @staticmethod
-    def wait():
-        """Wait until break event.
-        """
-        # todo log debug information.
-        while True:
-            time.sleep(0.3)
-
-    def start(self):
-        """Starts webhook server and long polling threads.
-        """
-        web_hooks = filter(lambda x: isinstance(x, WebHookMessenger), self.messengers)
-        for messenger in web_hooks:
-            messenger.bind_default_handler()
-
-        polling = filter(lambda x: isinstance(x, PollingMessenger), self.messengers)
-
-        polling_methods = [messenger.receive_updates for messenger in polling]
-        if polling_methods:
-            start_polling(polling_methods, True, 1)
-
-    def stop(self):
-        """Stops webhook server and long polling threads.
-        """
-        web_hooks = filter(lambda x: isinstance(x, WebHookMessenger), self.messengers)
-        for messenger in web_hooks:
-            messenger.default_handler.stop()
-        stop_polling()
-
-    def converse(self, quit="quit"):
-        """Simple console converse method.
-
-        Useful to test your middleware and talk with bot directly from your console.
-        Args:
-            quit: Name of exit keyword. Bot will proceed user messages until this keyword would be given.
-
-        """
-        user_input = ""
-        while user_input != quit:
-            user_input = quit
-            try:
-                user_input = input(">")
-            except EOFError:
-                print(user_input)
-            if user_input:
-                from python_bot.common.messenger.controllers.console import ConsoleMessenger
-                console = ConsoleMessenger(on_message_callback=self.on_message, bot=self)
-                console.on_message(
-                    BotTextMessage(user=console.get_user_info(1), text=user_input)
-                )
-
-    def on_message(self, request: BotRequest):
-        """Callback method received from messenger.
-
-        Executes all found middleware, then return response back to messenger.
-        """
-        message = self.get_message(request)
-        return request.messenger.handle(message)
-
-    def _validate_messengers(self):
-        for messenger in self.messengers:
-            pass
-
-
-class PythonBot(LocalizationMixIn, MiddlewareHandlerMixIn, BotHandlerMixIn):
-    def __init__(self,
-                 messengers=None, storage=None, middleware=None,
+class PythonBot(LocalizationMixIn, MiddlewareHandlerMixIn):
+    def __init__(self, storage=None, middleware=None,
                  tokenizer=None, locale=None, web_hook=None):
         self._user_settings = {
-            "messengers": messengers or (),
             "storage": storage,
             "middleware": middleware or (),
             "tokenizer": tokenizer or OrderedDict(),
             "locale": locale or OrderedDict(),
             "web_hook": web_hook
         }
-
-        self._validate_messengers()
+        self._messengers = []
+        self._running = False
+        self._polling_thread = None
         super().__init__()
 
     def __enter__(self):
-        self.start()
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
@@ -192,6 +107,16 @@ class PythonBot(LocalizationMixIn, MiddlewareHandlerMixIn, BotHandlerMixIn):
         if self.settings["web_hook"]:
             return PythonBot.load_module(self.settings["web_hook"])
 
+    request_class = BotRequest
+
+    @property
+    def messengers(self) -> list:
+        """Lazy Property list of messenger
+
+        Returns:
+            List of BaseMessenger objects corresponding to user settings."""
+        return self._messengers
+
     def on_exception(self, exc, request: BotRequest):
         bot_logger.error(exc)
 
@@ -219,6 +144,96 @@ class PythonBot(LocalizationMixIn, MiddlewareHandlerMixIn, BotHandlerMixIn):
             mod = entry(**params)
 
         return mod
+
+    @staticmethod
+    def wait():
+        """Wait until break event.
+        """
+        # todo log debug information.
+        while True:
+            time.sleep(0.3)
+
+    def start(self, wait=False):
+        """Starts webhook server and long polling threads.
+        """
+        web_hooks = filter(lambda x: isinstance(x, WebHookMessenger), self.messengers)
+        for messenger in web_hooks:
+            messenger.bind_default_handler()
+
+        polling = filter(lambda x: isinstance(x, PollingMessenger), self.messengers)
+
+        polling_methods = [messenger.receive_updates for messenger in polling]
+        if polling_methods:
+            self._polling_thread = start_polling(polling_methods, True, 1)
+        self._running = True
+        if wait:
+            self.wait()
+
+    def stop(self):
+        """Stops webhook server and long polling threads.
+        """
+        if not self._running:
+            return
+        web_hooks = filter(lambda x: isinstance(x, WebHookMessenger), self.messengers)
+        for messenger in web_hooks:
+            messenger.default_handler.stop()
+        stop_polling()
+        if self._polling_thread:
+            self._polling_thread.join()
+        self._running = False
+
+    def add_messenger(self, messenger_class, **kwargs) -> BaseMessenger:
+        """Add new messenger to bot.
+
+        Args:
+            messenger_class: Should be subclass of BaseMessenger.
+
+        """
+        if self._running:
+            raise ValueError("You can't add messenger while bot is running. You need to call stop first")
+
+        if not issubclass(messenger_class, BaseMessenger):
+            raise ValueError("messenger_class should be subclass of BaseMessenger")
+
+        params = {"on_message_callback": self.on_message, "bot": self}
+        mod = PythonBot.load_module((messenger_class, kwargs), params)
+        if mod:
+            self._messengers.append(mod)
+        return mod
+
+    def converse(self, quit="quit"):
+        """Simple console converse method.
+
+        Useful to test your middleware and talk with bot directly from your console.
+        Args:
+            quit: Name of exit keyword. Bot will proceed user messages until this keyword would be given.
+
+        """
+        user_input = ""
+        while user_input != quit:
+            user_input = quit
+            try:
+                user_input = input(">")
+            except EOFError:
+                print(user_input)
+            if user_input:
+                from python_bot.common.messenger.controllers.console import ConsoleMessenger
+                console = ConsoleMessenger(on_message_callback=self.on_message, bot=self)
+                console.on_message(
+                    BotTextMessage(user=console.get_user_info(1), text=user_input)
+                )
+
+    def on_message(self, request: BotRequest):
+        """Callback method received from messenger.
+
+        Executes all found middleware, then return response back to messenger.
+        """
+        message = self.get_message(request)
+        return request.messenger.handle(message)
+
+    def _validate_messengers(self):
+        for messenger in self.messengers:
+            pass
 
     def bind_web_hook_handler(self, handlers, base_path=None) -> BaseWebHookHandler:
         if self.settings["web_hook"]:

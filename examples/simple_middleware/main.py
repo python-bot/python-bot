@@ -22,7 +22,6 @@ def echo_middleware(get_message):
 # Adding echo middleware which send message to bot the same as request
 with PythonBot(
     middleware=[echo_middleware],
-    messengers=[]
 ) as bot:
     console_messenger_request = ConsoleMessenger().get_request(BotTextMessage(user_id=1, text="test"))
 

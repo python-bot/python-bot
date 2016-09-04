@@ -4,7 +4,6 @@ from python_bot.common.messenger.controllers.base.messenger import PollingMessen
 from python_bot.common.messenger.elements.base import UserInfo
 from python_bot.common.webhook.message import BotButtonResponse, BotTextResponse, BotImageResponse, \
     BotPersistentMenuResponse, BotTypingResponse
-from python_bot.common.webhook.request import BotRequest
 
 
 class SlackMessenger(PollingMessenger):
@@ -22,17 +21,9 @@ class SlackMessenger(PollingMessenger):
         from slackclient import SlackClient
         return SlackClient(token=self.access_token)
 
-    def get_request(self, user_id, text, **kwargs):
-        return BotRequest(messenger=self, user_id=user_id, text=text, **kwargs)
-
     def __init__(self, access_token=None, api_version=None, on_message_callback=None, bot=None):
         super().__init__(access_token, api_version, on_message_callback, bot)
         self.raw_client.rtm_connect()
-
-    def on_message(self, user_id, text, **kwargs):
-        request = self.get_request(user_id, text, **kwargs)
-        if callable(self._on_message_callback):
-            return self._on_message_callback(request)
 
     def send_button(self, message: BotButtonResponse):
         raise NotImplemented()

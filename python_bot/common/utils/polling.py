@@ -18,6 +18,13 @@ def stop_polling():
 
 
 def start_polling(retrieve_updates, none_stop=False, interval=1):
+    thread = threading.Thread(target=__start_polling, args=(retrieve_updates, none_stop, interval))
+    thread.daemon = True
+    thread.start()
+    return thread
+
+
+def __start_polling(retrieve_updates, none_stop=False, interval=1):
     from python_bot.bot.bot import bot_logger
     bot_logger.info('Started polling.')
     __stop_polling.clear()

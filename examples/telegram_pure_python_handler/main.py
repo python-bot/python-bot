@@ -47,16 +47,6 @@ class CustomMiddleware(MiddlewareMixin):
 
 with PythonBot(
         middleware=[CustomMiddleware],
-        messengers=[
-            (
-                    MyTelegramMessenger,
-                    {
-                        "access_token": ACCESS_TOKEN,
-                        # also due to NGROK, we need to override base server path
-                        "base_path": '/'
-                    }
-            )
-        ],
         web_hook=[PurePythonHandler, {
             "settings":
                 WebHookSettings(
@@ -64,4 +54,5 @@ with PythonBot(
                 )
         }]
 ) as bot:
-    bot.wait()
+    bot.add_messenger(MyTelegramMessenger, access_token=ACCESS_TOKEN, base_path="/")
+    bot.start(wait=True)

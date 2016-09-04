@@ -23,7 +23,6 @@ def echo_middleware(get_message):
 # Adding example middleware which send message to bot with previous message
 with PythonBot(
         middleware=[echo_middleware],
-        messengers=[],
         storage=[JsonDatabaseAdapter, {"database_path": "./user.db"}]
 ) as bot:
     bot.converse()
