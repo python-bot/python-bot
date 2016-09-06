@@ -1,0 +1,22 @@
+python-dateutil
+requests
+requests_toolbelt
+
+# optional packages
+emoji
+
+
+#database choose one of those packages
+jsondb
+pymongo
+
+# natural language processing choose one of those packages
+wit
+
+# docs and tests
+pytest
+Sphinx
+
+# clients
+slackclient
+pyTelegramBotAPI
