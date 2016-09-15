@@ -32,7 +32,7 @@ class JsonDatabaseAdapter(StorageAdapter):
     def get(self, statement_text, default=None):
         values = self.database.data(key=statement_text)
 
-        if not values:
+        if values is None:
             return default
 
         return values

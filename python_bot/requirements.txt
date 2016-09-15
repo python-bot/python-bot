@@ -1,10 +1,10 @@
 python-dateutil
 requests
 requests_toolbelt
+jsonpickle
 
 # optional packages
 emoji
-
 
 #database choose one of those packages
 jsondb

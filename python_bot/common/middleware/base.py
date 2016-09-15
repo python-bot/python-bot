@@ -13,7 +13,7 @@ class MiddlewareMixin(object):
         if hasattr(self, 'process_request') and not self.message_only:
             message = self.process_request(request)
 
-        if not message:
+        if callable(self.get_message) and not message:
             message = self.get_message(request)
 
         if hasattr(self, 'process_message') and not self.request_only:

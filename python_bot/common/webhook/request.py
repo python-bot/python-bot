@@ -21,6 +21,9 @@ class BotRequest:
         self.messenger = messenger
         self.text = message.text if hasattr(message, "text") else None
 
+        # state middleware
+        self.state_controller = None
+
     def __repr__(self):
         from pprint import pformat
         return pformat(vars(self), indent=4)
