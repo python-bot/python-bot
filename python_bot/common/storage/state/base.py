@@ -8,26 +8,64 @@ from python_bot.common import BotRequest
 class StateView(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def will_show(self, request: BotRequest, added=True):
+        """Will be called after all request middleware, but before response middleware
+
+        Actually called when StateControl changed to current view. When view is added this method will be called twice.
+
+        Args:
+            request: Bot Request proceeded by middleware
+            added: If added is True, then state class was pushed first time to StateController
+        """
         pass
 
     @abc.abstractmethod
     def will_hide(self, request: BotRequest, removed=True):
+        """Will be called after all request middleware, but before response middleware
+
+        Actually called when StateControl changed and current view was hidden by another.
+        When view is removed this method will be called twice.
+
+        Args:
+            request: Bot Request proceeded by middleware
+            removed: If removed is True, then state class was pop out from StateController
+        """
         pass
 
     @abc.abstractmethod
     def did_show(self, request: BotRequest, messages: list, added=True):
+        """Will be called after all middleware proceed
+
+        Actually called when StateControl changed to current view. When view is added this method will be called twice.
+
+        Args:
+            request: Bot Request proceeded by middleware
+            messages: List of messages to user. May be changed inside this method.
+            added: If added is True, then state class was pushed first time to StateController
+        """
         pass
 
     @abc.abstractmethod
     def did_hide(self, request: BotRequest, messages: list, removed=True):
+        """Will be called after all middleware proceed
+
+        Actually called when StateControl changed and current view was hidden by another.
+        When view is removed this method will be called twice.
+
+        Args:
+            request: Bot Request proceeded by middleware
+            messages: List of messages to user. May be changed inside this method.
+            removed: If removed is True, then state class was pop out from StateController
+        """
         pass
 
     @abc.abstractmethod
     def process_request(self, request: BotRequest):
+        """The same as for middleware class"""
         pass
 
     @abc.abstractmethod
     def process_message(self, request: BotRequest, messages: list):
+        """The same as for middleware class"""
         pass
 
 
@@ -89,7 +127,7 @@ class StateController:
         if self.current_state:
             self.__hide.append(self.current_state)
 
-        self.current_state = controller()
+        self.current_state = controller
         self.__added.append(self.current_state)
         self.__show.append(self.current_state)
 
@@ -102,7 +140,7 @@ class StateController:
             return
 
         for state in current_state[1:]:
-            self.__removed.append(state())
+            self.__removed.append(state)
 
         last = current_state[0]
         options["state"] = []
@@ -110,7 +148,7 @@ class StateController:
         self.user_storage.update(self.__controller_key, options)
 
         import jsonpickle
-        self.current_state = jsonpickle.decode(last)()
+        self.current_state = jsonpickle.decode(last)
         return self.current_state
 
     def get_state(self, index=None) -> StateView:
@@ -122,7 +160,7 @@ class StateController:
         if index is None:
             index = -1
 
-        self.current_state = jsonpickle.decode(current_state[index])()
+        self.current_state = jsonpickle.decode(current_state[index])
         return self.current_state
 
     def invalidate_state(self):
@@ -157,5 +195,5 @@ class StateController:
                 state.did_show(request, messages, added=added_or_removed)
 
     def __validate(self, controller):
-        if not issubclass(controller, StateView):
+        if not isinstance(controller, StateView):
             raise ValueError("Controller %r should be subclass of StateView" % controller)
