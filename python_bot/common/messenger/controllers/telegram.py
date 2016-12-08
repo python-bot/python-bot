@@ -17,7 +17,7 @@ class TelegramMessenger(WebHookMessenger):
         return self._messenger
 
     def set_web_hook_url(self, web_hook_url):
-        self.raw_client.set_webhook(web_hook_url, self.default_handler.settings.ssl_cert)
+        self.raw_client.set_webhook(web_hook_url, open(self.default_handler.settings.ssl_cert))
 
     @property
     def get_handlers(self):
