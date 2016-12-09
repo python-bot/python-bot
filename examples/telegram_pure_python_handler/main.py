@@ -28,6 +28,12 @@ class MyTelegramMessenger(TelegramMessenger):
         super().set_web_hook_url(NGROK_URL)
 
 
+# To generate self signed certificate use the following command:
+# 'openssl req -new -x509 -nodes -newkey rsa:1024 -keyout webhook_pkey.key -out webhook_cert.pem
+# -days 3650 -subj "/C={COUNTRY}/ST={STATE}/L={LOCATION}/O={ORG}/CN={DOMAIN_NAME}"'
+# You should fill following details: COUNTRY, STATE, ORG, LOCATION, DOMAIN_NAME
+# Note: that DOMAIN_NAME should be valid.
+
 bot_logger.setLevel(logging.DEBUG)
 
 helper = PrintHelper()

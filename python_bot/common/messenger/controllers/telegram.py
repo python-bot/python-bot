@@ -8,7 +8,7 @@ from python_bot.common.messenger.elements.base import UserInfo
 from python_bot.common.messenger.elements.message import create_message
 from python_bot.common.webhook.handlers.base import WebHookRequestHandler
 from python_bot.common.webhook.message import BotButtonResponse, BotTextResponse, BotImageResponse, \
-    BotTypingResponse, BotPersistentMenuResponse
+    BotTypingResponse, BotPersistentMenuResponse, BotResponse
 
 
 class TelegramMessenger(WebHookMessenger):
@@ -32,7 +32,7 @@ class TelegramMessenger(WebHookMessenger):
         self._messenger = telebot.TeleBot(access_token)
 
     def send_text_message(self, message: BotTextResponse):
-        self.raw_client.send_message(message.request_user_id, message.text)
+        self.raw_client.send_message(message.request_user_id, message.text, **self.__get_extra_kwargs(message))
 
     def send_button(self, message: BotButtonResponse):
         import telebot
@@ -40,7 +40,12 @@ class TelegramMessenger(WebHookMessenger):
         for button in message.buttons:
             markup.add(button.title)
 
-        return self.raw_client.send_message(message, message.text, reply_markup=markup, **message.kwargs)
+        return self.raw_client.send_message(
+            message,
+            message.text,
+            reply_markup=markup,
+            **self.__get_extra_kwargs(message)
+        )
 
     def send_image(self, message: BotImageResponse):
         if message.url:
@@ -49,7 +54,11 @@ class TelegramMessenger(WebHookMessenger):
             stream = open(message.path, "rb")
 
         try:
-            return self.raw_client.send_photo(message.request_user_id, stream, **message.kwargs)
+            return self.raw_client.send_photo(
+                message.request_user_id,
+                stream,
+                **self.__get_extra_kwargs(message)
+            )
         finally:
             stream.close()
 
@@ -70,6 +79,16 @@ class TelegramMessenger(WebHookMessenger):
         # user.timezone = user_details.get("timezone")
         # user.profile_pic = "https://graph.facebook.com/%s/picture" % user_id
         # return user
+
+    def __get_extra_kwargs(self, message: BotResponse):
+        keys = {
+            "caption",  # photo message
+            "disable_web_page_preview",  # text message
+            "reply_to_message_id",
+            "parse_mode",
+            "disable_notification"
+        }
+        return {key: message.kwargs[key] for key in message.kwargs if key in keys}
 
     def __process(self, data=None):
         if not data:
