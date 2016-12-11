@@ -4,7 +4,6 @@ import requests
 from requests.utils import guess_json_utf
 from gettext import gettext as _
 
-from python_bot.common import pack_string, unpack_string
 from python_bot.common.messenger.controllers.base.messenger import WebHookMessenger
 from python_bot.common.messenger.elements.base import UserInfo
 from python_bot.common.messenger.elements.message import create_message, MessageType
@@ -35,6 +34,7 @@ class TelegramMessenger(WebHookMessenger):
 
     def send_text_message(self, message: BotTextResponse):
         import telebot
+        from python_bot.common.utils.packer import pack_string
         markup = telebot.types.InlineKeyboardMarkup()
         for title in message.quick_replies:
             markup.add(
@@ -119,6 +119,7 @@ class TelegramMessenger(WebHookMessenger):
         user = telegram_message.from_user
 
         if inline and telegram_message.data:
+            from python_bot.common.utils.packer import unpack_string
             text = unpack_string(telegram_message.data, (str,))
             content_type = MessageType.text
             extra = {"inline": True}
