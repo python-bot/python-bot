@@ -17,7 +17,7 @@ ALLOWED_TYPES = [MessageType.text]
 
 def create_message(content_type, **kwargs):
     if content_type not in ALLOWED_TYPES:
-        return
+        raise NotImplementedError("Content type '%s' is not implemented " % content_type)
 
     for sub_class in BotBaseMessage.__subclasses__():
         if content_type == sub_class.content_type:
